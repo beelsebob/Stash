@@ -1,0 +1,452 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1F09AFEC15792B810081DC63 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F09AFEB15792B810081DC63 /* Cocoa.framework */; };
+		1F09AFF615792B810081DC63 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1F09AFF415792B810081DC63 /* InfoPlist.strings */; };
+		1F09AFF815792B810081DC63 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F09AFF715792B810081DC63 /* main.m */; };
+		1F09AFFC15792B810081DC63 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 1F09AFFA15792B810081DC63 /* Credits.rtf */; };
+		1F09AFFF15792B810081DC63 /* STAAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F09AFFE15792B810081DC63 /* STAAppDelegate.m */; };
+		1F09B00215792B810081DC63 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1F09B00015792B810081DC63 /* MainMenu.xib */; };
+		1F09B00A15792B810081DC63 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F09B00915792B810081DC63 /* SenTestingKit.framework */; };
+		1F09B00B15792B810081DC63 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F09AFEB15792B810081DC63 /* Cocoa.framework */; };
+		1F09B01315792B810081DC63 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1F09B01115792B810081DC63 /* InfoPlist.strings */; };
+		1F09B01615792B810081DC63 /* StashTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F09B01515792B810081DC63 /* StashTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1F09B00C15792B810081DC63 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1F09AFDE15792B810081DC63 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1F09AFE615792B810081DC63;
+			remoteInfo = Stash;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		1F09AFE715792B810081DC63 /* Stash.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Stash.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F09AFEB15792B810081DC63 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		1F09AFEE15792B810081DC63 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		1F09AFEF15792B810081DC63 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		1F09AFF015792B810081DC63 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1F09AFF315792B810081DC63 /* Stash-Info.plist */ = {isa = PBXFileReference; path = "Stash-Info.plist"; sourceTree = "<group>"; };
+		1F09AFF515792B810081DC63 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1F09AFF715792B810081DC63 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		1F09AFF915792B810081DC63 /* Stash-Prefix.pch */ = {isa = PBXFileReference; path = "Stash-Prefix.pch"; sourceTree = "<group>"; };
+		1F09AFFB15792B810081DC63 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
+		1F09AFFD15792B810081DC63 /* STAAppDelegate.h */ = {isa = PBXFileReference; path = STAAppDelegate.h; sourceTree = "<group>"; };
+		1F09AFFE15792B810081DC63 /* STAAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STAAppDelegate.m; sourceTree = "<group>"; };
+		1F09B00115792B810081DC63 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		1F09B00815792B810081DC63 /* StashTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StashTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F09B00915792B810081DC63 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		1F09B01015792B810081DC63 /* StashTests-Info.plist */ = {isa = PBXFileReference; path = "StashTests-Info.plist"; sourceTree = "<group>"; };
+		1F09B01215792B810081DC63 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1F09B01415792B810081DC63 /* StashTests.h */ = {isa = PBXFileReference; path = StashTests.h; sourceTree = "<group>"; };
+		1F09B01515792B810081DC63 /* StashTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StashTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1F09AFE415792B810081DC63 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F09AFEC15792B810081DC63 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F09B00415792B810081DC63 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F09B00A15792B810081DC63 /* SenTestingKit.framework in Frameworks */,
+				1F09B00B15792B810081DC63 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1F09AFDC15792B810081DC63 = {
+			isa = PBXGroup;
+			children = (
+				1F09AFF115792B810081DC63 /* Stash */,
+				1F09B00E15792B810081DC63 /* StashTests */,
+				1F09AFEA15792B810081DC63 /* Frameworks */,
+				1F09AFE815792B810081DC63 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1F09AFE815792B810081DC63 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1F09AFE715792B810081DC63 /* Stash.app */,
+				1F09B00815792B810081DC63 /* StashTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1F09AFEA15792B810081DC63 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1F09AFEB15792B810081DC63 /* Cocoa.framework */,
+				1F09B00915792B810081DC63 /* SenTestingKit.framework */,
+				1F09AFED15792B810081DC63 /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		1F09AFED15792B810081DC63 /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1F09AFEE15792B810081DC63 /* AppKit.framework */,
+				1F09AFEF15792B810081DC63 /* CoreData.framework */,
+				1F09AFF015792B810081DC63 /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		1F09AFF115792B810081DC63 /* Stash */ = {
+			isa = PBXGroup;
+			children = (
+				1F09AFFD15792B810081DC63 /* STAAppDelegate.h */,
+				1F09AFFE15792B810081DC63 /* STAAppDelegate.m */,
+				1F09B00015792B810081DC63 /* MainMenu.xib */,
+				1F09AFF215792B810081DC63 /* Supporting Files */,
+			);
+			path = Stash;
+			sourceTree = "<group>";
+		};
+		1F09AFF215792B810081DC63 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1F09AFF315792B810081DC63 /* Stash-Info.plist */,
+				1F09AFF415792B810081DC63 /* InfoPlist.strings */,
+				1F09AFF715792B810081DC63 /* main.m */,
+				1F09AFF915792B810081DC63 /* Stash-Prefix.pch */,
+				1F09AFFA15792B810081DC63 /* Credits.rtf */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		1F09B00E15792B810081DC63 /* StashTests */ = {
+			isa = PBXGroup;
+			children = (
+				1F09B01415792B810081DC63 /* StashTests.h */,
+				1F09B01515792B810081DC63 /* StashTests.m */,
+				1F09B00F15792B810081DC63 /* Supporting Files */,
+			);
+			path = StashTests;
+			sourceTree = "<group>";
+		};
+		1F09B00F15792B810081DC63 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1F09B01015792B810081DC63 /* StashTests-Info.plist */,
+				1F09B01115792B810081DC63 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1F09AFE615792B810081DC63 /* Stash */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1F09B01915792B810081DC63 /* Build configuration list for PBXNativeTarget "Stash" */;
+			buildPhases = (
+				1F09AFE315792B810081DC63 /* Sources */,
+				1F09AFE415792B810081DC63 /* Frameworks */,
+				1F09AFE515792B810081DC63 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Stash;
+			productName = Stash;
+			productReference = 1F09AFE715792B810081DC63 /* Stash.app */;
+			productType = "com.apple.product-type.application";
+		};
+		1F09B00715792B810081DC63 /* StashTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1F09B01C15792B810081DC63 /* Build configuration list for PBXNativeTarget "StashTests" */;
+			buildPhases = (
+				1F09B00315792B810081DC63 /* Sources */,
+				1F09B00415792B810081DC63 /* Frameworks */,
+				1F09B00515792B810081DC63 /* Resources */,
+				1F09B00615792B810081DC63 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1F09B00D15792B810081DC63 /* PBXTargetDependency */,
+			);
+			name = StashTests;
+			productName = StashTests;
+			productReference = 1F09B00815792B810081DC63 /* StashTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1F09AFDE15792B810081DC63 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = STA;
+				LastUpgradeCheck = 0430;
+				ORGANIZATIONNAME = "Hunted Cow Studios";
+			};
+			buildConfigurationList = 1F09AFE115792B810081DC63 /* Build configuration list for PBXProject "Stash" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 1F09AFDC15792B810081DC63;
+			productRefGroup = 1F09AFE815792B810081DC63 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1F09AFE615792B810081DC63 /* Stash */,
+				1F09B00715792B810081DC63 /* StashTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1F09AFE515792B810081DC63 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F09AFF615792B810081DC63 /* InfoPlist.strings in Resources */,
+				1F09AFFC15792B810081DC63 /* Credits.rtf in Resources */,
+				1F09B00215792B810081DC63 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F09B00515792B810081DC63 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F09B01315792B810081DC63 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1F09B00615792B810081DC63 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1F09AFE315792B810081DC63 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F09AFF815792B810081DC63 /* main.m in Sources */,
+				1F09AFFF15792B810081DC63 /* STAAppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F09B00315792B810081DC63 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F09B01615792B810081DC63 /* StashTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1F09B00D15792B810081DC63 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1F09AFE615792B810081DC63 /* Stash */;
+			targetProxy = 1F09B00C15792B810081DC63 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		1F09AFF415792B810081DC63 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1F09AFF515792B810081DC63 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		1F09AFFA15792B810081DC63 /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1F09AFFB15792B810081DC63 /* en */,
+			);
+			name = Credits.rtf;
+			sourceTree = "<group>";
+		};
+		1F09B00015792B810081DC63 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1F09B00115792B810081DC63 /* en */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		1F09B01115792B810081DC63 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1F09B01215792B810081DC63 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1F09B01715792B810081DC63 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		1F09B01815792B810081DC63 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		1F09B01A15792B810081DC63 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Stash/Stash-Prefix.pch";
+				INFOPLIST_FILE = "Stash/Stash-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		1F09B01B15792B810081DC63 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Stash/Stash-Prefix.pch";
+				INFOPLIST_FILE = "Stash/Stash-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		1F09B01D15792B810081DC63 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Stash.app/Contents/MacOS/Stash";
+				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Stash/Stash-Prefix.pch";
+				INFOPLIST_FILE = "StashTests/StashTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		1F09B01E15792B810081DC63 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Stash.app/Contents/MacOS/Stash";
+				FRAMEWORK_SEARCH_PATHS = "$(DEVELOPER_LIBRARY_DIR)/Frameworks";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Stash/Stash-Prefix.pch";
+				INFOPLIST_FILE = "StashTests/StashTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1F09AFE115792B810081DC63 /* Build configuration list for PBXProject "Stash" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1F09B01715792B810081DC63 /* Debug */,
+				1F09B01815792B810081DC63 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1F09B01915792B810081DC63 /* Build configuration list for PBXNativeTarget "Stash" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1F09B01A15792B810081DC63 /* Debug */,
+				1F09B01B15792B810081DC63 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		1F09B01C15792B810081DC63 /* Build configuration list for PBXNativeTarget "StashTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1F09B01D15792B810081DC63 /* Debug */,
+				1F09B01E15792B810081DC63 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1F09AFDE15792B810081DC63 /* Project object */;
+}
