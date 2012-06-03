@@ -85,6 +85,10 @@ NSImage *NSImageFromSTASymbolType(STASymbolType t);
     }
     
     [self setDocsets:[NSMutableArray arrayWithCapacity:[libraryDirectories count]]];
+    __block NSUInteger numDocsetsIndexing = 0;
+    __block NSUInteger numDocsetsIndexed = 0;
+    __block BOOL finishedSearchingForDocsets = NO;
+    [[self searchField] setEnabled:NO];
     for (NSString *path in libraryDirectories)
     {
         NSString *docsetDirectory = [[[path stringByAppendingPathComponent:@"Developer"] stringByAppendingPathComponent:@"Documentation"] stringByAppendingPathComponent:@"DocSets"];
@@ -98,14 +102,34 @@ NSImage *NSImageFromSTASymbolType(STASymbolType t);
             }
             if (nil == indexedDocset)
             {
+                numDocsetsIndexing++;
                 indexedDocset = [STADocSet docSetWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@", [docsetDirectory stringByAppendingPathComponent:docset]]]
                                              onceIndexed:^(STADocSet *idx)
                                  {
                                      [NSKeyedArchiver archiveRootObject:idx toFile:docsetCachePath];
+                                     numDocsetsIndexed++;
+                                     if (numDocsetsIndexed == numDocsetsIndexing && finishedSearchingForDocsets)
+                                     {
+                                         dispatch_async(dispatch_get_main_queue(), ^()
+                                                        {
+                                                            [[self searchField] setEnabled:YES];
+                                                            [[self searchField] selectText:self];
+                                                            [[self titleView] setStringValue:@""];
+                                                        });
+                                     }
                                  }];
             }
             [[self docsets] addObject:indexedDocset];
         }
+    }
+    finishedSearchingForDocsets = YES;
+    if (numDocsetsIndexed == numDocsetsIndexing)
+    {
+        [[self searchField] setEnabled:YES];
+    }
+    else
+    {
+        [[self titleView] setStringValue:@"Stash is Indexing, Please Wait..."];
     }
 }
 
@@ -130,7 +154,7 @@ NSImage *NSImageFromSTASymbolType(STASymbolType t);
 
 - (IBAction)search:(id)sender
 {
-    NSString *searchString = [sender stringValue];
+    NSString *searchString = [[sender stringValue] lowercaseString];
     [self setCurrentSearchString:searchString];
     [self setResults:[NSMutableArray array]];
     [[self resultsTable] deselectAll:self];
@@ -211,7 +235,7 @@ NSImage *NSImageFromSTASymbolType(STASymbolType t)
         case STASymbolTypeClass:
             return [NSImage imageNamed:@"Class"];
         case STASymbolTypeInterface:
-            return nil;
+            return [NSImage imageNamed:@"Protocol"];
         case STASymbolTypeCategory:
             return [NSImage imageNamed:@"Category"];
         case STASymbolTypeClassMethod:

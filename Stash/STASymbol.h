@@ -46,11 +46,11 @@ STASymbolType STASymbolTypeFromNSString(NSString *symbolTypeString);
 
 @interface STASymbol : NSObject <NSCoding>
 
-@property (assign) STALanguage language;
-@property (assign) STASymbolType symbolType;
-@property (copy) NSString *symbolName;
-@property (copy) NSString *parentName;
-@property (copy) NSURL *url;
+@property (nonatomic,assign) STALanguage language;
+@property (nonatomic,assign) STASymbolType symbolType;
+@property (nonatomic,copy) NSString *symbolName;
+@property (nonatomic,copy) NSString *parentName;
+@property (nonatomic,copy) NSURL *url;
 
 - (id)initWithLanguageString:(NSString *)language symbolTypeString:(NSString *)symbolType symbolName:(NSString *)symbolName url:(NSURL *)url;
 - (id)initWithLanguageString:(NSString *)language symbolTypeString:(NSString *)symbolType symbolName:(NSString *)symbolName parentName:(NSString *)parentName url:(NSURL *)url;

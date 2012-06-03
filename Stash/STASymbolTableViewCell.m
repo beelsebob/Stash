@@ -108,13 +108,13 @@
 		
         imageFrame.origin.y += ceil(([controlView isFlipped] ? cellFrame.size.height + imageFrame.size.height : cellFrame.size.height - imageFrame.size.height) / 2);
 		[[self image] compositeToPoint:imageFrame.origin operation:NSCompositeSourceOver];
-        
-		NSRect newFrame = cellFrame;
-		newFrame.origin.x += kTextOriginXOffset;
-		newFrame.origin.y += kTextOriginYOffset;
-		newFrame.size.height -= kTextHeightAdjust;
-		[super drawWithFrame:newFrame inView:controlView];
     }
+    
+    NSRect newFrame = cellFrame;
+    newFrame.origin.x += kTextOriginXOffset;
+    newFrame.origin.y += kTextOriginYOffset;
+    newFrame.size.height -= kTextHeightAdjust;
+    [super drawWithFrame:newFrame inView:controlView];
 }
 
 - (NSSize)cellSize

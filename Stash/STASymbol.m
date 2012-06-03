@@ -124,7 +124,7 @@
 
 - (BOOL)matches:(NSString *)searchString
 {
-    return [_symbolName hasPrefix:searchString];
+    return [[_symbolName lowercaseString] hasPrefix:searchString];
 }
 
 - (NSComparisonResult)compare:(id)other
