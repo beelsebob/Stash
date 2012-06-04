@@ -48,6 +48,8 @@
 		1F50A3DE157BAAA400CF6068 /* Union@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F50A3C6157BAAA400CF6068 /* Union@2x.png */; };
 		1F50A3DF157BAAA400CF6068 /* Value.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F50A3C7157BAAA400CF6068 /* Value.png */; };
 		1F50A3E0157BAAA400CF6068 /* Value@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F50A3C8157BAAA400CF6068 /* Value@2x.png */; };
+		1FBF3DE2157CAFD4007B8D97 /* STAPreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1FBF3DE1157CAFD4007B8D97 /* STAPreferencesController.xib */; };
+		1FBF3DE6157CAFEC007B8D97 /* STAPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FBF3DE5157CAFEC007B8D97 /* STAPreferencesController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -116,6 +118,9 @@
 		1F50A3C6157BAAA400CF6068 /* Union@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Union@2x.png"; sourceTree = "<group>"; };
 		1F50A3C7157BAAA400CF6068 /* Value.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Value.png; sourceTree = "<group>"; };
 		1F50A3C8157BAAA400CF6068 /* Value@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Value@2x.png"; sourceTree = "<group>"; };
+		1FBF3DE1157CAFD4007B8D97 /* STAPreferencesController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = STAPreferencesController.xib; sourceTree = "<group>"; };
+		1FBF3DE4157CAFEC007B8D97 /* STAPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STAPreferencesController.h; sourceTree = "<group>"; };
+		1FBF3DE5157CAFEC007B8D97 /* STAPreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STAPreferencesController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -194,6 +199,9 @@
 				1F09B030157A12E70081DC63 /* STASymbol.m */,
 				1F50A3A4157BA41C00CF6068 /* STASymbolTableViewCell.h */,
 				1F50A3A5157BA41C00CF6068 /* STASymbolTableViewCell.m */,
+				1FBF3DE1157CAFD4007B8D97 /* STAPreferencesController.xib */,
+				1FBF3DE4157CAFEC007B8D97 /* STAPreferencesController.h */,
+				1FBF3DE5157CAFEC007B8D97 /* STAPreferencesController.m */,
 				1F09AFF215792B810081DC63 /* Supporting Files */,
 				1F09B024157A06510081DC63 /* Objective-C-HMTL-Parser */,
 				1F50A3B0157BAAA400CF6068 /* Images */,
@@ -373,6 +381,7 @@
 				1F50A3DE157BAAA400CF6068 /* Union@2x.png in Resources */,
 				1F50A3DF157BAAA400CF6068 /* Value.png in Resources */,
 				1F50A3E0157BAAA400CF6068 /* Value@2x.png in Resources */,
+				1FBF3DE2157CAFD4007B8D97 /* STAPreferencesController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -414,6 +423,7 @@
 				1F09B02B157A06510081DC63 /* HTMLParser.m in Sources */,
 				1F09B031157A12E70081DC63 /* STASymbol.m in Sources */,
 				1F50A3A6157BA41C00CF6068 /* STASymbolTableViewCell.m in Sources */,
+				1FBF3DE6157CAFEC007B8D97 /* STAPreferencesController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -12,6 +12,9 @@
 
 @interface STADocSet : NSObject <NSCoding>
 
+@property (copy) NSString *name;
+@property (copy) NSStream *version;
+
 + (id)docSetWithURL:(NSURL *)url onceIndexed:(void(^)(STADocSet *))completion;
 - (id)initWithURL:(NSURL *)url onceIndexed:(void(^)(STADocSet *))completion;
 

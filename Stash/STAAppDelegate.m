@@ -34,6 +34,7 @@ NSImage *NSImageFromSTASymbolType(STASymbolType t);
 @synthesize resultWebView = _resultWebView;
 @synthesize titleView = _titleView;
 @synthesize searchField = _searchField;
+@synthesize preferencesController = _preferencesController;
 
 @synthesize docsets = _docsets;
 @synthesize currentSearchString = _currentSearchString;
@@ -46,14 +47,19 @@ NSImage *NSImageFromSTASymbolType(STASymbolType t);
     [[self statusItem] setMenu:[self statusMenu]];
     [[self statusItem] setTitle:@"Stash"];
     [[self statusItem] setHighlightMode:YES];
-        
+    
+    [self setPreferencesController:[[STAPreferencesController alloc] initWithNibNamed:@"STAPreferencesController" bundle:nil]];
+    
     void(^handler)(NSEvent *) = ^(NSEvent *e)
     {
-        NSUInteger modifiers = [e modifierFlags];
-        NSUInteger desiredModifiers = NSControlKeyMask | NSCommandKeyMask | NSAlternateKeyMask;
-        if ((modifiers & desiredModifiers) == desiredModifiers && [[e charactersIgnoringModifiers] characterAtIndex:0] == ' ')
+        if (![[self preferencesController] isMonitoringForEvents])
         {
-            [self toggleStashWindow:self];
+            NSUInteger modifiers = [e modifierFlags];
+            NSUInteger desiredModifiers = [[self preferencesController] keyboardShortcutModifierFlags];
+            if ((modifiers & desiredModifiers) == desiredModifiers && [[e charactersIgnoringModifiers] characterAtIndex:0] == [[self preferencesController] keyboardShortcutCharacter])
+            {
+                [self toggleStashWindow:self];
+            }
         }
     };
     
@@ -185,6 +191,16 @@ NSImage *NSImageFromSTASymbolType(STASymbolType t);
                            }
                        });
     }
+}
+
+- (IBAction)openPreferences:(id)sender
+{
+    [[self preferencesController] showWindow];
+}
+
+- (IBAction)quit:(id)sender
+{
+    [NSApp terminate:sender];
 }
 
 #pragma mark - Table View Data Source

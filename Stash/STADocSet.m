@@ -23,6 +23,8 @@
 
 @synthesize loaded;
 @synthesize symbols;
+@synthesize name;
+@synthesize version;
 
 + (id)docSetWithURL:(NSURL *)url onceIndexed:(void(^)(STADocSet *))completion
 {
@@ -36,13 +38,19 @@
     if (nil != self)
     {
         [self setLoaded:NO];
+        NSURL *contentsDirectory = [url URLByAppendingPathComponent:@"Contents"];
+        NSData *infoPlistData = [NSData dataWithContentsOfURL:[contentsDirectory URLByAppendingPathComponent:@"Info.plist"]];
+        NSPropertyListFormat format;
+        NSError *err = nil;
+        NSDictionary *infoPlistContents = [NSPropertyListSerialization propertyListWithData:infoPlistData options:NSPropertyListImmutable format:&format error:&err];
+        [self setName:[infoPlistContents objectForKey:@"CFBundleName"]];
+        [self setVersion:[infoPlistContents objectForKey:@"CFBundleVersion"]];
         [self setSymbols:[NSMutableArray array]];
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^()
                        {
                            @autoreleasepool
                            {
-                               NSLog(@"Loading Docset at %@", url);
-                               NSURL *resourcesURL = [[url URLByAppendingPathComponent:@"Contents"] URLByAppendingPathComponent:@"Resources"];
+                               NSURL *resourcesURL = [contentsDirectory URLByAppendingPathComponent:@"Resources"];
                                [self processURL:resourcesURL];
                                [self setLoaded:YES];
                                dispatch_sync(dispatch_get_main_queue(), ^()
@@ -57,6 +65,8 @@
 }
 
 #define kDocSetSymbolsKey @"D.s"
+#define kDocSetNameKey    @"D.n"
+#define kDocSetVersionKey @"D.v"
 
 - (id)initWithCoder:(NSCoder *)aDecoder
 {
@@ -65,6 +75,8 @@
     if (nil != self)
     {
         [self setSymbols:[aDecoder decodeObjectForKey:kDocSetSymbolsKey]];
+        [self setName:[aDecoder decodeObjectForKey:kDocSetNameKey]];
+        [self setVersion:[aDecoder decodeObjectForKey:kDocSetVersionKey]];
         [self setLoaded:YES];
     }
     
@@ -74,6 +86,8 @@
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
     [aCoder encodeObject:[self symbols] forKey:kDocSetSymbolsKey];
+    [aCoder encodeObject:[self name] forKey:kDocSetNameKey];
+    [aCoder encodeObject:[self version] forKey:kDocSetVersionKey];
 }
 
 - (void)processURL:(NSURL *)url
@@ -97,10 +111,10 @@
 
                 for (HTMLNode *anchor in [[parser body] findChildTags:@"a"])
                 {
-                    NSString *name = [anchor getAttributeNamed:@"name"];
-                    if (nil != name)
+                    NSString *n = [anchor getAttributeNamed:@"name"];
+                    if (nil != n)
                     {
-                        NSScanner *scanner = [NSScanner scannerWithString:name];
+                        NSScanner *scanner = [NSScanner scannerWithString:n];
                         NSString *dump;
                         NSString *language;
                         NSString *symbolType;
@@ -116,8 +130,8 @@
                         if (!success) { continue; }
                         success = [scanner scanUpToString:@"/" intoString:&parent];
                         STASymbol *s = nil;
-                        NSString *fullPath = [path stringByAppendingFormat:@"#%@", name];
-                        if ([scanner scanLocation] < [name length] - 1)
+                        NSString *fullPath = [path stringByAppendingFormat:@"#%@", n];
+                        if ([scanner scanLocation] < [n length] - 1)
                         {
                             [scanner setScanLocation:[scanner scanLocation] + 1];
                             success = [scanner scanUpToString:@"/" intoString:&symbol];

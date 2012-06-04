@@ -152,10 +152,6 @@ STALanguage STALanguageFromNSString(NSString *languageString)
     {
         return STALanguageJavascript;
     }
-    else
-    {
-        NSLog(@"Could not convert \"%@\" to lanugage type", languageString);
-    }
     return STALanguageUnknown;
 }
 
@@ -228,10 +224,6 @@ STASymbolType STASymbolTypeFromNSString(NSString *symbolTypeString)
     else if ([symbolTypeString isEqualToString:@"clconst"])
     {
         return STASymbolTypeClassConstant;
-    }
-    else
-    {
-        NSLog(@"Could not convert \"%@\" to symbol type", symbolTypeString);
     }
     
     return STASymbolTypeUnknown;
