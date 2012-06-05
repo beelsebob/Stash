@@ -30,6 +30,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 @synthesize window = _window;
 @synthesize statusMenu = _statusMenu;
+@synthesize openStashMenuItem = _openStashMenuItem;
 @synthesize statusItem = _statusItem;
 @synthesize resultsTable = _resultsTable;
 @synthesize resultWebView = _resultWebView;
@@ -51,6 +52,10 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     
     [self setPreferencesController:[[STAPreferencesController alloc] initWithNibNamed:@"STAPreferencesController" bundle:nil]];
     [[self preferencesController] setDelegate:self];
+
+    unichar c = [[self preferencesController] keyboardShortcutCharacter];
+    [[self openStashMenuItem] setKeyEquivalent:[NSString stringWithCharacters:&c length:1]];
+    [[self openStashMenuItem] setKeyEquivalentModifierMask:[[self preferencesController] keyboardShortcutModifierFlags]];
     
     void(^handler)(NSEvent *) = ^(NSEvent *e)
     {
@@ -256,6 +261,13 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
             [docset unload];
         }
     }
+}
+
+- (void)preferencesControllerDidUpdateMenuShortcut:(STAPreferencesController *)prefsController
+{
+    unichar c = [[self preferencesController] keyboardShortcutCharacter];
+    [[self openStashMenuItem] setKeyEquivalent:[NSString stringWithCharacters:&c length:1]];
+    [[self openStashMenuItem] setKeyEquivalentModifierMask:[[self preferencesController] keyboardShortcutModifierFlags]];
 }
 
 @end

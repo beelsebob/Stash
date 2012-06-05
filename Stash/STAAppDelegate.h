@@ -15,6 +15,7 @@
 
 @property (assign) IBOutlet NSWindow *window;
 @property (strong) IBOutlet NSMenu *statusMenu;
+@property (weak) IBOutlet NSMenuItem *openStashMenuItem;
 @property (strong) NSStatusItem *statusItem;
 @property (strong) IBOutlet NSTableView *resultsTable;
 @property (strong) IBOutlet WebView *resultWebView;

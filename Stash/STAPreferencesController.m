@@ -165,6 +165,7 @@ NSString *descriptingStringFromChar(unichar c)
                                [self setupShortcutText];
                                [[self shortcutButton] setState:NSOffState];
                                [self performSelector:@selector(removeEventMonitor) withObject:nil afterDelay:0.0];
+                               [[self delegate] preferencesControllerDidUpdateMenuShortcut:self];
                                return e;
                            }]];
 }

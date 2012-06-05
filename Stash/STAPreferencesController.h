@@ -15,6 +15,7 @@
 @protocol STAPreferencesDelegate <NSObject>
 
 - (void)preferencesControllerDidUpdateSelectedDocsets:(STAPreferencesController *)prefsController;
+- (void)preferencesControllerDidUpdateMenuShortcut:(STAPreferencesController *)prefsController;
 
 @end
 
