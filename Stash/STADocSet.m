@@ -21,10 +21,11 @@
 
 @implementation STADocSet
 
-@synthesize loaded;
-@synthesize symbols;
-@synthesize name;
-@synthesize version;
+@synthesize loaded = _loaded;
+@synthesize symbols = _symbols;
+@synthesize name = _name;
+@synthesize version = _version;
+@synthesize platform = _platform;
 
 + (id)docSetWithURL:(NSURL *)url onceIndexed:(void(^)(STADocSet *))completion
 {
@@ -45,6 +46,8 @@
         NSDictionary *infoPlistContents = [NSPropertyListSerialization propertyListWithData:infoPlistData options:NSPropertyListImmutable format:&format error:&err];
         [self setName:[infoPlistContents objectForKey:@"CFBundleName"]];
         [self setVersion:[infoPlistContents objectForKey:@"CFBundleVersion"]];
+        NSString *platformString = [infoPlistContents objectForKey:@"DocSetPlatformFamily"];
+        [self setPlatform:[platformString isEqualToString:@"macosx"] ? STAPlatformMacOS : [platformString isEqualToString:@"iphoneos"] ? STAPlatformIOS : STAPlatformUnknown];
         [self setSymbols:[NSMutableArray array]];
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^()
                        {
@@ -64,9 +67,10 @@
     return self;
 }
 
-#define kDocSetSymbolsKey @"D.s"
-#define kDocSetNameKey    @"D.n"
-#define kDocSetVersionKey @"D.v"
+#define kDocSetSymbolsKey  @"D.s"
+#define kDocSetNameKey     @"D.n"
+#define kDocSetVersionKey  @"D.v"
+#define kDocSetPlatformKey @"D.p"
 
 - (id)initWithCoder:(NSCoder *)aDecoder
 {
@@ -77,6 +81,7 @@
         [self setSymbols:[aDecoder decodeObjectForKey:kDocSetSymbolsKey]];
         [self setName:[aDecoder decodeObjectForKey:kDocSetNameKey]];
         [self setVersion:[aDecoder decodeObjectForKey:kDocSetVersionKey]];
+        [self setPlatform:[aDecoder decodeIntForKey:kDocSetPlatformKey]];
         [self setLoaded:YES];
     }
     
@@ -88,6 +93,7 @@
     [aCoder encodeObject:[self symbols] forKey:kDocSetSymbolsKey];
     [aCoder encodeObject:[self name] forKey:kDocSetNameKey];
     [aCoder encodeObject:[self version] forKey:kDocSetVersionKey];
+    [aCoder encodeInt:[self platform] forKey:kDocSetPlatformKey];
 }
 
 - (void)processURL:(NSURL *)url
@@ -135,11 +141,11 @@
                         {
                             [scanner setScanLocation:[scanner scanLocation] + 1];
                             success = [scanner scanUpToString:@"/" intoString:&symbol];
-                            s = [[STASymbol alloc] initWithLanguageString:language symbolTypeString:symbolType symbolName:symbol parentName:parent url:[NSURL URLWithString:fullPath]];
+                            s = [[STASymbol alloc] initWithLanguageString:language symbolTypeString:symbolType symbolName:symbol parentName:parent url:[NSURL URLWithString:fullPath] docSet:self];
                         }
                         else
                         {
-                            s = [[STASymbol alloc] initWithLanguageString:language symbolTypeString:symbolType symbolName:parent url:[NSURL URLWithString:fullPath]];
+                            s = [[STASymbol alloc] initWithLanguageString:language symbolTypeString:symbolType symbolName:parent url:[NSURL URLWithString:fullPath] docSet:self];
                         }
                         
                         STASymbolType t = [s symbolType];

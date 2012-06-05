@@ -10,6 +10,7 @@
 
 @interface STASymbolTableViewCell : NSTextFieldCell
 
-@property (strong) NSImage *image;
+@property (strong) NSImage *symbolTypeImage;
+@property (strong) NSImage *platformImage;
 
 @end

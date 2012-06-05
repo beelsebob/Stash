@@ -50,6 +50,10 @@
 		1F50A3E0157BAAA400CF6068 /* Value@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F50A3C8157BAAA400CF6068 /* Value@2x.png */; };
 		1FBF3DE2157CAFD4007B8D97 /* STAPreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1FBF3DE1157CAFD4007B8D97 /* STAPreferencesController.xib */; };
 		1FBF3DE6157CAFEC007B8D97 /* STAPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FBF3DE5157CAFEC007B8D97 /* STAPreferencesController.m */; };
+		1FBF3DED157E3F22007B8D97 /* iOS.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FBF3DE9157E3F22007B8D97 /* iOS.png */; };
+		1FBF3DEE157E3F22007B8D97 /* iOS@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FBF3DEA157E3F22007B8D97 /* iOS@2x.png */; };
+		1FBF3DEF157E3F22007B8D97 /* MacOS.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FBF3DEB157E3F22007B8D97 /* MacOS.png */; };
+		1FBF3DF0157E3F22007B8D97 /* MacOS@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FBF3DEC157E3F22007B8D97 /* MacOS@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -121,6 +125,10 @@
 		1FBF3DE1157CAFD4007B8D97 /* STAPreferencesController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = STAPreferencesController.xib; sourceTree = "<group>"; };
 		1FBF3DE4157CAFEC007B8D97 /* STAPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STAPreferencesController.h; sourceTree = "<group>"; };
 		1FBF3DE5157CAFEC007B8D97 /* STAPreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STAPreferencesController.m; sourceTree = "<group>"; };
+		1FBF3DE9157E3F22007B8D97 /* iOS.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iOS.png; sourceTree = "<group>"; };
+		1FBF3DEA157E3F22007B8D97 /* iOS@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS@2x.png"; sourceTree = "<group>"; };
+		1FBF3DEB157E3F22007B8D97 /* MacOS.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MacOS.png; sourceTree = "<group>"; };
+		1FBF3DEC157E3F22007B8D97 /* MacOS@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MacOS@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -254,6 +262,10 @@
 		1F50A3B0157BAAA400CF6068 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				1FBF3DE9157E3F22007B8D97 /* iOS.png */,
+				1FBF3DEA157E3F22007B8D97 /* iOS@2x.png */,
+				1FBF3DEB157E3F22007B8D97 /* MacOS.png */,
+				1FBF3DEC157E3F22007B8D97 /* MacOS@2x.png */,
 				1F50A3B1157BAAA400CF6068 /* Category.png */,
 				1F50A3B2157BAAA400CF6068 /* Category@2x.png */,
 				1F50A3B3157BAAA400CF6068 /* Class.png */,
@@ -382,6 +394,10 @@
 				1F50A3DF157BAAA400CF6068 /* Value.png in Resources */,
 				1F50A3E0157BAAA400CF6068 /* Value@2x.png in Resources */,
 				1FBF3DE2157CAFD4007B8D97 /* STAPreferencesController.xib in Resources */,
+				1FBF3DED157E3F22007B8D97 /* iOS.png in Resources */,
+				1FBF3DEE157E3F22007B8D97 /* iOS@2x.png in Resources */,
+				1FBF3DEF157E3F22007B8D97 /* MacOS.png in Resources */,
+				1FBF3DF0157E3F22007B8D97 /* MacOS@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

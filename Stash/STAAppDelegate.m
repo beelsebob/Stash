@@ -13,6 +13,7 @@
 #import "STASymbolTableViewCell.h"
 
 NSImage *NSImageFromSTASymbolType(STASymbolType t);
+NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 @interface STAAppDelegate () <NSWindowDelegate>
 
@@ -56,7 +57,7 @@ NSImage *NSImageFromSTASymbolType(STASymbolType t);
         {
             NSUInteger modifiers = [e modifierFlags];
             NSUInteger desiredModifiers = [[self preferencesController] keyboardShortcutModifierFlags];
-            if ((modifiers & desiredModifiers) == desiredModifiers && [[e charactersIgnoringModifiers] characterAtIndex:0] == [[self preferencesController] keyboardShortcutCharacter])
+            if (modifiers == desiredModifiers && [[e charactersIgnoringModifiers] characterAtIndex:0] == [[self preferencesController] keyboardShortcutCharacter])
             {
                 [self toggleStashWindow:self];
             }
@@ -234,10 +235,24 @@ NSImage *NSImageFromSTASymbolType(STASymbolType t);
 
 - (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    [cell setImage:NSImageFromSTASymbolType([[[self sortedResults] objectAtIndex:row] symbolType])];
+    [cell setSymbolTypeImage:NSImageFromSTASymbolType([[[self sortedResults] objectAtIndex:row] symbolType])];
+    [cell setPlatformImage:NSImageFromSTAPlatform([[[[self sortedResults] objectAtIndex:row] docSet] platform])];
 }
 
 @end
+
+NSImage *NSImageFromSTAPlatform(STAPlatform p)
+{
+    switch (p)
+    {
+        case STAPlatformIOS:
+            return [NSImage imageNamed:@"iOS"];
+        case STAPlatformMacOS:
+            return [NSImage imageNamed:@"MacOS"];
+        default:
+            return nil;
+    }
+}
 
 NSImage *NSImageFromSTASymbolType(STASymbolType t)
 {

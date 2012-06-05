@@ -21,7 +21,8 @@
 
 @implementation STASymbolTableViewCell
 
-@synthesize image = _image;
+@synthesize symbolTypeImage = _symbolTypeImage;
+@synthesize platformImage = _platformImage;
 
 - (id)initTextCell:(NSString *)aString
 {
@@ -62,16 +63,27 @@
 - (NSRect)titleRectForBounds:(NSRect)cellRect
 {	
 	NSSize imageSize;
-	NSRect imageFrame;
+	NSRect platformFrame;
+    NSRect symbolTypeFrame;
     
-	imageSize = [[self image] size];
-	NSDivideRect(cellRect, &imageFrame, &cellRect, 3 + imageSize.width, NSMinXEdge);
-    
-	imageFrame.origin.x += kImageOriginXOffset;
-	imageFrame.origin.y -= kImageOriginYOffset;
-	imageFrame.size = imageSize;
-	
-	imageFrame.origin.y += ceil((cellRect.size.height - imageFrame.size.height) / 2);
+    if (nil != [self platformImage])
+    {
+        imageSize = [[self platformImage] size];
+        NSDivideRect(cellRect, &platformFrame, &cellRect, 3 + imageSize.width, NSMinXEdge);
+        platformFrame.origin.x += kImageOriginXOffset;
+        platformFrame.origin.y -= kImageOriginYOffset;
+        platformFrame.size = imageSize;
+        platformFrame.origin.y += ceil((cellRect.size.height - platformFrame.size.height) / 2);
+    }
+    if (nil != [self symbolTypeImage])
+    {
+        imageSize = [[self symbolTypeImage] size];
+        NSDivideRect(cellRect, &symbolTypeFrame, &cellRect, 3 + imageSize.width, NSMinXEdge);
+        symbolTypeFrame.origin.x += kImageOriginXOffset;
+        symbolTypeFrame.origin.y -= kImageOriginYOffset;
+        symbolTypeFrame.size = imageSize;
+        symbolTypeFrame.origin.y += ceil((cellRect.size.height - symbolTypeFrame.size.height) / 2);
+    }
 	
 	NSRect newFrame = cellRect;
 	newFrame.origin.x += kTextOriginXOffset;
@@ -95,19 +107,31 @@
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
-	if ([self image] != nil)
+	if ([self platformImage] != nil)
 	{
-		NSSize imageSize = [[self image] size];
-        NSRect imageFrame;
+        NSSize imageSize;
+        NSRect platformFrame;
         
-        NSDivideRect(cellFrame, &imageFrame, &cellFrame, 3 + imageSize.width, NSMinXEdge);
-        
-        imageFrame.origin.x += kImageOriginXOffset;
-		imageFrame.origin.y -= kImageOriginYOffset;
-        imageFrame.size = imageSize;
+        imageSize = [[self platformImage] size];
+        NSDivideRect(cellFrame, &platformFrame, &cellFrame, 3 + imageSize.width, NSMinXEdge);
+        platformFrame.origin.x += kImageOriginXOffset;
+        platformFrame.origin.y -= kImageOriginYOffset;
+        platformFrame.size = imageSize;
+        platformFrame.origin.y += ceil(([controlView isFlipped] ? cellFrame.size.height + platformFrame.size.height : cellFrame.size.height - platformFrame.size.height) / 2);
 		
-        imageFrame.origin.y += ceil(([controlView isFlipped] ? cellFrame.size.height + imageFrame.size.height : cellFrame.size.height - imageFrame.size.height) / 2);
-		[[self image] compositeToPoint:imageFrame.origin operation:NSCompositeSourceOver];
+		[[self platformImage] compositeToPoint:platformFrame.origin operation:NSCompositeSourceOver];
+    }
+    if ([self symbolTypeImage] != nil)
+    {
+        NSSize imageSize;
+        NSRect symbolTypeFrame;
+        imageSize = [[self symbolTypeImage] size];
+        NSDivideRect(cellFrame, &symbolTypeFrame, &cellFrame, 3 + imageSize.width, NSMinXEdge);
+        symbolTypeFrame.origin.x += kImageOriginXOffset;
+        symbolTypeFrame.origin.y -= kImageOriginYOffset;
+        symbolTypeFrame.size = imageSize;
+        symbolTypeFrame.origin.y += ceil(([controlView isFlipped] ? cellFrame.size.height + symbolTypeFrame.size.height : cellFrame.size.height - symbolTypeFrame.size.height) / 2);
+		[[self symbolTypeImage] compositeToPoint:symbolTypeFrame.origin operation:NSCompositeSourceOver];
     }
     
     NSRect newFrame = cellFrame;
@@ -120,7 +144,7 @@
 - (NSSize)cellSize
 {
     NSSize cellSize = [super cellSize];
-    cellSize.width += ([self image] ? [[self image] size].width : 0) + 3;
+    cellSize.width += ([self platformImage] ? [[self platformImage] size].width : 0) + 3 + ([self symbolTypeImage] ? [[self symbolTypeImage] size].width : 0) + 3;
     return cellSize;
 }
 

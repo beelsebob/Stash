@@ -8,20 +8,23 @@
 
 #import "STASymbol.h"
 
+#import "STADocSet.h"
+
 @implementation STASymbol
 
 @synthesize language = _language;
 @synthesize symbolType = _symbolType;
 @synthesize symbolName = _symbolName;
-@synthesize parentName = _parentName;
+//@synthesize parentName = _parentName;
 @synthesize url = _url;
+@synthesize docSet = _docSet;
 
-- (id)initWithLanguageString:(NSString *)language symbolTypeString:(NSString *)symbolType symbolName:(NSString *)symbolName url:(NSURL *)url
+- (id)initWithLanguageString:(NSString *)language symbolTypeString:(NSString *)symbolType symbolName:(NSString *)symbolName url:(NSURL *)url docSet:(STADocSet *)docSet
 {
-    return [self initWithLanguageString:language symbolTypeString:symbolType symbolName:symbolName parentName:nil url:url];
+    return [self initWithLanguageString:language symbolTypeString:symbolType symbolName:symbolName parentName:nil url:url docSet:docSet];
 }
 
-- (id)initWithLanguageString:(NSString *)language symbolTypeString:(NSString *)symbolType symbolName:(NSString *)symbolName parentName:(NSString *)parentName url:(NSURL *)url
+- (id)initWithLanguageString:(NSString *)language symbolTypeString:(NSString *)symbolType symbolName:(NSString *)symbolName parentName:(NSString *)parentName url:(NSURL *)url docSet:(STADocSet *)docSet
 {
     self = [super init];
     
@@ -30,8 +33,9 @@
         [self setLanguage:STALanguageFromNSString(language)];
         [self setSymbolType:STASymbolTypeFromNSString(symbolType)];
         [self setSymbolName:symbolName];
-        [self setParentName:parentName];
+//        [self setParentName:parentName];
         [self setUrl:url];
+        [self setDocSet:docSet];
     }
     
     return self;
@@ -40,8 +44,9 @@
 #define kSymbolLanguageKey   @"S.l"
 #define kSymbolSymbolTypeKey @"S.k"
 #define kSymbolSymbolNameKey @"S.n"
-#define kSymbolParentNameKey @"S.p"
+//#define kSymbolParentNameKey @"S.p"
 #define kSymbolURLKey        @"S.u"
+#define kSymbolDocSetKey     @"S.d"
 
 - (id)initWithCoder:(NSCoder *)aDecoder
 {
@@ -52,8 +57,9 @@
         [self setLanguage:[aDecoder decodeIntForKey:kSymbolLanguageKey]];
         [self setSymbolType:[aDecoder decodeIntForKey:kSymbolSymbolTypeKey]];
         [self setSymbolName:[aDecoder decodeObjectForKey:kSymbolSymbolNameKey]];
-        [self setParentName:[aDecoder decodeObjectForKey:kSymbolParentNameKey]];
+//        [self setParentName:[aDecoder decodeObjectForKey:kSymbolParentNameKey]];
         [self setUrl:[aDecoder decodeObjectForKey:kSymbolURLKey]];
+        [self setDocSet:[aDecoder decodeObjectForKey:kSymbolDocSetKey]];
     }
     
     return self;
@@ -64,8 +70,9 @@
     [aCoder encodeInt:[self language] forKey:kSymbolLanguageKey];
     [aCoder encodeInt:[self symbolType] forKey:kSymbolSymbolTypeKey];
     [aCoder encodeObject:[self symbolName] forKey:kSymbolSymbolNameKey];
-    [aCoder encodeObject:[self parentName] forKey:kSymbolParentNameKey];
+//    [aCoder encodeObject:[self parentName] forKey:kSymbolParentNameKey];
     [aCoder encodeObject:[self url] forKey:kSymbolURLKey];
+    [aCoder encodeObject:[self docSet] forKey:kSymbolDocSetKey];
 }
 
 - (NSUInteger)hash
@@ -75,7 +82,7 @@
 
 - (BOOL)isEqual:(id)object
 {
-    return _language == [(STASymbol *)object language] && _symbolType == [(STASymbol *)object symbolType] && [_parentName isEqualToString:[(STASymbol *)object parentName]] && [_symbolName isEqualToString:[(STASymbol *)object parentName]];
+    return _language == [(STASymbol *)object language] && _symbolType == [(STASymbol *)object symbolType] /*&& [_parentName isEqualToString:[(STASymbol *)object parentName]]*/ && [_symbolName isEqualToString:[(STASymbol *)object symbolName]];
 }
 
 - (NSString *)description
@@ -106,9 +113,9 @@
                 case STASymbolTypeClass:
                     return [NSString stringWithFormat:@"@interface %@", _symbolName];
                 case STASymbolTypeClassMethod:
-                    return [NSString stringWithFormat:@"+[%@ %@]", _parentName, _symbolName];
+                    return [NSString stringWithFormat:@"+%@", _symbolName];
                 case STASymbolTypeInstanceMethod:
-                    return [NSString stringWithFormat:@"-[%@ %@]", _parentName, _symbolName];
+                    return [NSString stringWithFormat:@"-%@", _symbolName];
                 case STASymbolTypeInstanceProperty:
                     return [NSString stringWithFormat:@"@property %@", _symbolName];
                 case STASymbolTypeCategory:
@@ -129,7 +136,14 @@
 
 - (NSComparisonResult)compare:(id)other
 {
-    return [_symbolName compare:[other symbolName]];
+    NSComparisonResult r = [_symbolName compare:[other symbolName]];
+    if (r == NSOrderedSame)
+    {
+        STAPlatform p1 = [_docSet platform];
+        STAPlatform p2 = [[other docSet] platform];
+        return p1 < p2 ? NSOrderedAscending : p1 > p2 ? NSOrderedDescending : NSOrderedSame;
+    }
+    return r;
 }
 
 @end

@@ -10,10 +10,19 @@
 
 #import "STASymbol.h"
 
+typedef enum
+{
+    STAPlatformMacOS,
+    STAPlatformIOS,
+    
+    STAPlatformUnknown
+} STAPlatform;
+
 @interface STADocSet : NSObject <NSCoding>
 
 @property (copy) NSString *name;
 @property (copy) NSStream *version;
+@property (assign) STAPlatform platform;
 
 + (id)docSetWithURL:(NSURL *)url onceIndexed:(void(^)(STADocSet *))completion;
 - (id)initWithURL:(NSURL *)url onceIndexed:(void(^)(STADocSet *))completion;
