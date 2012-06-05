@@ -165,4 +165,14 @@
     }
 }
 
+- (NSUInteger)hash
+{
+    return [[self name] hash];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    return [[self name] isEqual:[object name]];
+}
+
 @end

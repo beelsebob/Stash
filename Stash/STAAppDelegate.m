@@ -125,6 +125,7 @@ NSImage *NSImageFromSTASymbolType(STASymbolType t);
                                      }
                                  }];
             }
+            [[self preferencesController] registerDocset:indexedDocset];
             [[self docsets] addObject:indexedDocset];
         }
     }
@@ -164,7 +165,7 @@ NSImage *NSImageFromSTASymbolType(STASymbolType t);
     [self setCurrentSearchString:searchString];
     [self setResults:[NSMutableArray array]];
     [[self resultsTable] deselectAll:self];
-    for (STADocSet *docSet in [self docsets])
+    for (STADocSet *docSet in [[self preferencesController] enabledDocsets])
     {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^()
                        {

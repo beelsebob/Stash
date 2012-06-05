@@ -8,6 +8,8 @@
 
 #import "STAPreferencesController.h"
 
+#import "STASymbolTableViewCell.h"
+
 #define kModifierFlagsKey @"Modifier Flags"
 #define kKeyboardShortcutKey @"Keyboard Shortcut"
 #define kEnabledDocsetsKey @"Enabled Docsets"
@@ -145,6 +147,8 @@ NSString *descriptingStringFromChar(unichar c)
 - (void)registerDocset:(STADocSet *)docset
 {
     [[self internalRegisteredDocsets] addObject:docset];
+    [[self docsetTable] reloadData];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:[self defaultPreferences]];
 }
 
 - (IBAction)changeShortcut:(id)sender
@@ -201,6 +205,49 @@ NSString *descriptingStringFromChar(unichar c)
 - (NSUInteger)keyboardShortcutModifierFlags
 {
     return [[[NSUserDefaults standardUserDefaults] objectForKey:kModifierFlagsKey] unsignedIntegerValue];
+}
+
+#pragma mark - Table View Data Source
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    return [[self registeredDocsets] count];
+}
+
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    STADocSet *docSet = [[[self registeredDocsets] sortedArrayUsingComparator:^ NSComparisonResult (STADocSet *ds1, STADocSet *ds2)
+                          {
+                              return [[ds1 name] compare:[ds2 name]];
+                          }] objectAtIndex:row];
+    if ([[tableColumn identifier] isEqualToString:@"name"])
+    {
+        return [docSet name];
+    }
+    else
+    {
+        return [NSNumber numberWithBool:[[self enabledDocsets] containsObject:docSet]];
+    }
+}
+
+- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    STADocSet *docSet = [[[self registeredDocsets] sortedArrayUsingComparator:^ NSComparisonResult (STADocSet *ds1, STADocSet *ds2)
+                          {
+                              return [[ds1 name] compare:[ds2 name]];
+                          }] objectAtIndex:row];
+    if (![[tableColumn identifier] isEqualToString:@"name"])
+    {
+        NSMutableArray *enabledDocsetNames = [[[NSUserDefaults standardUserDefaults] objectForKey:kEnabledDocsetsKey] mutableCopy];
+        if ([object boolValue])
+        {
+            [enabledDocsetNames addObject:[docSet name]];
+        }
+        else
+        {
+            [enabledDocsetNames removeObject:[docSet name]];
+        }
+        [[NSUserDefaults standardUserDefaults] setObject:enabledDocsetNames forKey:kEnabledDocsetsKey];
+    }
 }
 
 @end

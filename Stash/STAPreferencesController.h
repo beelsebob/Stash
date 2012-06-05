@@ -10,7 +10,7 @@
 
 #import "STADocSet.h"
 
-@interface STAPreferencesController : NSObject
+@interface STAPreferencesController : NSObject <NSTableViewDataSource, NSTableViewDelegate>
 
 @property (strong) IBOutlet NSWindow *window;
 @property (readonly) NSArray *enabledDocsets;
@@ -18,7 +18,7 @@
 @property (readonly) unichar keyboardShortcutCharacter;
 @property (strong) IBOutlet NSButton *shortcutButton;
 @property (strong) IBOutlet NSTextField *shortcutText;
-@property (strong) IBOutlet NSScrollView *docsetTable;
+@property (strong) IBOutlet NSTableView *docsetTable;
 @property (readonly) BOOL isMonitoringForEvents;
 
 - (id)initWithNibNamed:(NSString *)nibName bundle:(NSBundle *)bundle;
