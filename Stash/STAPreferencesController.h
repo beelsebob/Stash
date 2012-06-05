@@ -10,8 +10,17 @@
 
 #import "STADocSet.h"
 
+@class STAPreferencesController;
+
+@protocol STAPreferencesDelegate <NSObject>
+
+- (void)preferencesControllerDidUpdateSelectedDocsets:(STAPreferencesController *)prefsController;
+
+@end
+
 @interface STAPreferencesController : NSObject <NSTableViewDataSource, NSTableViewDelegate>
 
+@property (weak) id<STAPreferencesDelegate> delegate;
 @property (strong) IBOutlet NSWindow *window;
 @property (readonly) NSArray *enabledDocsets;
 @property (readonly) NSUInteger keyboardShortcutModifierFlags;

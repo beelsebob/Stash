@@ -23,10 +23,13 @@ typedef enum
 @property (copy) NSString *name;
 @property (copy) NSStream *version;
 @property (assign) STAPlatform platform;
+@property (copy) NSString *cachePath;
 
-+ (id)docSetWithURL:(NSURL *)url onceIndexed:(void(^)(STADocSet *))completion;
-- (id)initWithURL:(NSURL *)url onceIndexed:(void(^)(STADocSet *))completion;
++ (id)docSetWithURL:(NSURL *)url cachePath:(NSString *)cachePath onceIndexed:(void(^)(STADocSet *))completion;
+- (id)initWithURL:(NSURL *)url cachePath:(NSString *)cachePath onceIndexed:(void(^)(STADocSet *))completion;
 
 - (void)search:(NSString *)searchString onResult:(void(^)(STASymbol *))result;
+
+- (void)unload;
 
 @end

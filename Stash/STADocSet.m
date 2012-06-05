@@ -17,6 +17,8 @@
 @property (assign, getter=isLoaded) BOOL loaded;
 @property (strong) NSMutableArray *symbols;
 
+- (void)reload;
+
 @end
 
 @implementation STADocSet
@@ -26,18 +28,20 @@
 @synthesize name = _name;
 @synthesize version = _version;
 @synthesize platform = _platform;
+@synthesize cachePath = _cachePath;
 
-+ (id)docSetWithURL:(NSURL *)url onceIndexed:(void(^)(STADocSet *))completion
++ (id)docSetWithURL:(NSURL *)url cachePath:(NSString *)cachePath onceIndexed:(void(^)(STADocSet *))completion
 {
-    return [[self alloc] initWithURL:url onceIndexed:completion];
+    return [[self alloc] initWithURL:url cachePath:cachePath onceIndexed:completion];
 }
 
-- (id)initWithURL:(NSURL *)url onceIndexed:(void(^)(STADocSet *))completion
+- (id)initWithURL:(NSURL *)url cachePath:(NSString *)cachePath onceIndexed:(void(^)(STADocSet *))completion
 {
     self = [super init];
     
     if (nil != self)
     {
+        [self setCachePath:cachePath];
         [self setLoaded:NO];
         NSURL *contentsDirectory = [url URLByAppendingPathComponent:@"Contents"];
         NSData *infoPlistData = [NSData dataWithContentsOfURL:[contentsDirectory URLByAppendingPathComponent:@"Info.plist"]];
@@ -162,12 +166,32 @@
 
 - (void)search:(NSString *)searchString onResult:(void(^)(STASymbol *))result
 {
+    if (![self isLoaded])
+    {
+        [self reload];
+    }
     for (STASymbol *s in [self symbols])
     {
         if ([s matches:searchString])
         {
             result(s);
         }
+    }
+}
+
+- (void)unload
+{
+    [self setLoaded:NO];
+    [self setSymbols:[NSMutableArray array]];
+}
+
+- (void)reload
+{
+    STADocSet *docset = [NSKeyedUnarchiver unarchiveObjectWithFile:[self cachePath]];
+    if (nil != docset)
+    {
+        [self setSymbols:[docset symbols]];
+        [self setLoaded:YES];
     }
 }
 

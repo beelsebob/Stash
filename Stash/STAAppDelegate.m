@@ -50,6 +50,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     [[self statusItem] setHighlightMode:YES];
     
     [self setPreferencesController:[[STAPreferencesController alloc] initWithNibNamed:@"STAPreferencesController" bundle:nil]];
+    [[self preferencesController] setDelegate:self];
     
     void(^handler)(NSEvent *) = ^(NSEvent *e)
     {
@@ -106,11 +107,13 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
             if ([[NSFileManager defaultManager] fileExistsAtPath:docsetCachePath isDirectory:&isDir])
             {
                 indexedDocset = [NSKeyedUnarchiver unarchiveObjectWithFile:docsetCachePath];
+                [indexedDocset setCachePath:docsetCachePath];
             }
             if (nil == indexedDocset)
             {
                 numDocsetsIndexing++;
                 indexedDocset = [STADocSet docSetWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@", [docsetDirectory stringByAppendingPathComponent:docset]]]
+                                               cachePath:docsetCachePath
                                              onceIndexed:^(STADocSet *idx)
                                  {
                                      [NSKeyedArchiver archiveRootObject:idx toFile:docsetCachePath];
@@ -128,6 +131,10 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
             }
             [[self preferencesController] registerDocset:indexedDocset];
             [[self docsets] addObject:indexedDocset];
+            if (![[[self preferencesController] enabledDocsets] containsObject:indexedDocset])
+            {
+                [indexedDocset unload];
+            }
         }
     }
     finishedSearchingForDocsets = YES;
@@ -237,6 +244,18 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 {
     [cell setSymbolTypeImage:NSImageFromSTASymbolType([[[self sortedResults] objectAtIndex:row] symbolType])];
     [cell setPlatformImage:NSImageFromSTAPlatform([[[[self sortedResults] objectAtIndex:row] docSet] platform])];
+}
+
+#pragma mark - Prefs Delegate
+- (void)preferencesControllerDidUpdateSelectedDocsets:(STAPreferencesController *)prefsController
+{
+    for (STADocSet *docset in [self docsets])
+    {
+        if (![[prefsController enabledDocsets] containsObject:docset])
+        {
+            [docset unload];
+        }
+    }
 }
 
 @end

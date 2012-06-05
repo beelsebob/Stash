@@ -63,6 +63,8 @@ NSString *descriptingStringFromChar(unichar c)
 @end
 
 @implementation STAPreferencesController
+
+@synthesize delegate = _delegate;
 @synthesize shortcutButton = _shortcutButton;
 @synthesize shortcutText = _shortcutText;
 @synthesize docsetTable = _docsetTable;
@@ -247,6 +249,7 @@ NSString *descriptingStringFromChar(unichar c)
             [enabledDocsetNames removeObject:[docSet name]];
         }
         [[NSUserDefaults standardUserDefaults] setObject:enabledDocsetNames forKey:kEnabledDocsetsKey];
+        [[self delegate] preferencesControllerDidUpdateSelectedDocsets:self];
     }
 }
 
