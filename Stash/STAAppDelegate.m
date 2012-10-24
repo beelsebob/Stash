@@ -79,7 +79,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 - (void)readDocsets
 {
     NSError *err;
-    NSArray *libraryDirectories = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask | NSLocalDomainMask | NSSystemDomainMask, YES);
+    NSArray *docsetRoots = [self docsetRoots];
     NSString *pathForArchive = [[NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES) objectAtIndex:0] stringByAppendingPathComponent:@"Stash"];
     BOOL isDir;
     BOOL appSupportDirectoryIsPresent = [[NSFileManager defaultManager] fileExistsAtPath:pathForArchive isDirectory:&isDir];
@@ -97,14 +97,14 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
         }
     }
     
-    [self setDocsets:[NSMutableArray arrayWithCapacity:[libraryDirectories count]]];
+    [self setDocsets:[NSMutableArray arrayWithCapacity:[docsetRoots count]]];
     __block NSUInteger numDocsetsIndexing = 0;
     __block NSUInteger numDocsetsIndexed = 0;
     __block BOOL finishedSearchingForDocsets = NO;
     [[self searchField] setEnabled:NO];
-    for (NSString *path in libraryDirectories)
+    for (NSString *path in docsetRoots)
     {
-        NSString *docsetDirectory = [[[path stringByAppendingPathComponent:@"Developer"] stringByAppendingPathComponent:@"Documentation"] stringByAppendingPathComponent:@"DocSets"];
+        NSString *docsetDirectory = [[[[path stringByAppendingPathComponent:@"Developer"] stringByAppendingPathComponent:@"Shared"] stringByAppendingPathComponent:@"Documentation"] stringByAppendingPathComponent:@"DocSets"];
         for (NSString *docset in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docsetDirectory error:&err])
         {
             STADocSet *indexedDocset = nil;
@@ -151,6 +151,18 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     {
         [[self titleView] setStringValue:@"Stash is Indexing, Please Wait..."];
     }
+}
+
+- (NSArray *)docsetRoots
+{
+    NSMutableArray *docsetRoots = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask | NSLocalDomainMask | NSSystemDomainMask, YES) mutableCopy];
+/*    [docsetRoots addObject:@"/Applications/Xcode.app/Contents"];
+    NSError *err = nil;
+    for (NSString *platformRoot in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:@"/Applications/Xcode.app/Contents/Developer/Platforms" error:&err])
+    {
+        [docsetRoots addObject:[@"/Applications/Xcode.app/Contents/Developer/Platforms" stringByAppendingPathComponent:platformRoot]];
+    }*/
+    return [docsetRoots copy];
 }
 
 - (IBAction)toggleStashWindow:(id)sender
