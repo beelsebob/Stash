@@ -206,18 +206,18 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
         NSString *docsetDirectory = [[[[path stringByAppendingPathComponent:@"Developer"] stringByAppendingPathComponent:@"Shared"] stringByAppendingPathComponent:@"Documentation"] stringByAppendingPathComponent:@"DocSets"];
         for (NSString *docset in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docsetDirectory error:&err])
         {
-            STADocSet *indexedDocset = nil;
-            NSString *docsetCachePath = [[pathForArchive stringByAppendingPathComponent:docset] stringByAppendingPathExtension:@"stashidx"];
-            if ([[NSFileManager defaultManager] fileExistsAtPath:docsetCachePath isDirectory:&isDir])
+            NSString *docsetPath = [docsetDirectory stringByAppendingPathComponent:docset];
+            BOOL docsetExists = [[NSFileManager defaultManager] fileExistsAtPath:docsetPath isDirectory:&isDir];
+            if (docsetExists && isDir)
             {
-                indexedDocset = [NSKeyedUnarchiver unarchiveObjectWithFile:docsetCachePath];
-                [indexedDocset setCachePath:docsetCachePath];
-            }
-            if (nil == indexedDocset)
-            {
-                NSString *docsetPath = [docsetDirectory stringByAppendingPathComponent:docset];
-                BOOL docsetExists = [[NSFileManager defaultManager] fileExistsAtPath:docsetPath isDirectory:&isDir];
-                if (docsetExists & isDir)
+                STADocSet *indexedDocset = nil;
+                NSString *docsetCachePath = [[pathForArchive stringByAppendingPathComponent:docset] stringByAppendingPathExtension:@"stashidx"];
+                if ([[NSFileManager defaultManager] fileExistsAtPath:docsetCachePath isDirectory:&isDir])
+                {
+                    indexedDocset = [NSKeyedUnarchiver unarchiveObjectWithFile:docsetCachePath];
+                    [indexedDocset setCachePath:docsetCachePath];
+                }
+                if (nil == indexedDocset)
                 {
                     numDocsetsIndexing++;
                     indexedDocset = [STADocSet docSetWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@", docsetPath]]
@@ -237,12 +237,15 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                                          }
                                      }];
                 }
-            }
-            [[self preferencesController] registerDocset:indexedDocset];
-            [[self docsets] addObject:indexedDocset];
-            if (![[[self preferencesController] enabledDocsets] containsObject:indexedDocset])
-            {
-                [indexedDocset unload];
+                if (nil != indexedDocset)
+                {
+                    [[self preferencesController] registerDocset:indexedDocset];
+                    [[self docsets] addObject:indexedDocset];
+                    if (![[[self preferencesController] enabledDocsets] containsObject:indexedDocset])
+                    {
+                        [indexedDocset unload];
+                    }
+                }
             }
         }
     }
@@ -275,7 +278,6 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
         [[self window] makeKeyAndOrderFront:self];
         [[self window] setNextResponder:self];
         [[self window] makeFirstResponder:[self searchField]];
-        NSLog(@"Selecting text");
         [[self searchField] selectText:self];
         [NSApp activateIgnoringOtherApps:YES];
     }
