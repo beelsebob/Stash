@@ -21,8 +21,11 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 @property (copy) NSString *currentSearchString;
 @property (strong) NSMutableArray *results;
 @property (strong) NSArray *sortedResults;
+@property (assign, getter=isFindUIShowing) BOOL findUIShowing;
 
 - (void)readDocsets;
+- (void)showFindUI;
+- (void)searchAgain:(BOOL)backwards;
 
 @end
 
@@ -42,6 +45,8 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 @synthesize currentSearchString = _currentSearchString;
 @synthesize results = _results;
 @synthesize sortedResults = _sortedResults;
+
+@synthesize findUIShowing = _findUIShowing;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
@@ -67,14 +72,107 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
             {
                 [self toggleStashWindow:self];
             }
-            
         }
     };
     
     [NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyUpMask handler:handler];
     [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyUpMask handler:^ NSEvent * (NSEvent *e) { handler(e); return e; }];
+    [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyDownMask handler:^ NSEvent * (NSEvent *e)
+     {
+         NSUInteger modifiers = [e modifierFlags] & NSDeviceIndependentModifierFlagsMask;
+         if (modifiers == NSCommandKeyMask &&
+             ([[e charactersIgnoringModifiers] isEqualToString:@"f"] ||
+              ([[e charactersIgnoringModifiers] isEqualToString:@"g"] && [self isFindUIShowing])))
+         {
+             return nil;
+         }
+         if (modifiers == (NSCommandKeyMask | NSShiftKeyMask) &&
+             [[e charactersIgnoringModifiers] isEqualToString:@"G"] &&
+             [self isFindUIShowing])
+         {
+             return nil;
+         }
+         return e;
+     }];
+    [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyUpMask handler:^ NSEvent * (NSEvent *e)
+     {
+         NSUInteger modifiers = [e modifierFlags] & NSDeviceIndependentModifierFlagsMask;
+         if (modifiers == NSCommandKeyMask && [[e charactersIgnoringModifiers] isEqualToString:@"f"])
+         {
+             if (![self isFindUIShowing])
+             {
+                 [self showFindUI];
+             }
+             else
+             {
+                 [self hideSearchBar:self];
+             }
+             return nil;
+         }
+         if (modifiers == NSCommandKeyMask || modifiers == (NSCommandKeyMask | NSShiftKeyMask))
+         {
+             if (([[e charactersIgnoringModifiers] isEqualToString:@"g"] || [[e charactersIgnoringModifiers] isEqualToString:@"G"]) && [self isFindUIShowing])
+             {
+                 [self searchAgain:(modifiers & NSShiftKeyMask) == 0 ? YES : NO];
+                 return nil;
+             }
+             
+         }
+         return e;
+     }];
     
     [self readDocsets];
+}
+
+- (void)showFindUI
+{
+    [[self window] makeFirstResponder:[self inPageSearchField]];
+    if (![self isFindUIShowing])
+    {
+        [self setFindUIShowing:YES];
+        NSRect currentFrame = [[self resultWebView] frame];
+        currentFrame.size.height -= 25.0f;
+        [NSAnimationContext runAnimationGroup:^ (NSAnimationContext *ctx)
+         {
+             [[[self resultWebView] animator] setFrame:currentFrame];
+         }
+                            completionHandler:^()
+        {
+            [[self resultWebView] setFrame:currentFrame];
+        }];
+    }
+}
+
+- (IBAction)hideSearchBar:(id)sender
+{
+    [[self window] makeFirstResponder:[self searchField]];
+    if ([self isFindUIShowing])
+    {
+        [self setFindUIShowing:NO];
+        [NSAnimationContext runAnimationGroup:^ (NSAnimationContext *ctx)
+         {
+             NSRect currentFrame = [[self resultWebView] frame];
+             currentFrame.size.height += 25.0f;
+             [[[self resultWebView] animator] setFrame:currentFrame];
+         }
+                            completionHandler:^(){}];
+    }
+}
+
+- (IBAction)searchWithinPage:(id)sender
+{
+    [[self resultWebView] searchFor:[[self inPageSearchField] stringValue]
+                          direction:YES
+                      caseSensitive:NO
+                               wrap:YES];
+}
+
+- (void)searchAgain:(BOOL)backwards
+{
+    [[self resultWebView] searchFor:[[self inPageSearchField] stringValue]
+                          direction:backwards
+                      caseSensitive:NO
+                               wrap:YES];
 }
 
 - (void)readDocsets
@@ -171,6 +269,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     {
         [[self window] makeKeyAndOrderFront:self];
         [[self window] setNextResponder:self];
+        [[self window] makeFirstResponder:[self searchField]];
         [[self searchField] selectText:self];
         [NSApp activateIgnoringOtherApps:YES];
     }
@@ -189,6 +288,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 - (IBAction)search:(id)sender
 {
     NSString *searchString = [[[self searchField] stringValue] lowercaseString];
+    [self hideSearchBar:self];
     [self setCurrentSearchString:searchString];
     [self setResults:[NSMutableArray array]];
     [[self resultsTable] deselectAll:self];

@@ -23,11 +23,14 @@
 @property (strong) IBOutlet NSSearchField *searchField;
 @property (strong) STAPreferencesController *preferencesController;
 @property (weak) IBOutlet NSMatrix *searchMethodSelector;
+@property (weak) IBOutlet NSSearchField *inPageSearchField;
 
 - (IBAction)toggleStashWindow:(id)sender;
 - (IBAction)search:(id)sender;
 - (IBAction)openPreferences:(id)sender;
 - (IBAction)quit:(id)sender;
 - (IBAction)setSearchMethod:(id)sender;
+- (IBAction)hideSearchBar:(id)sender;
+- (IBAction)searchWithinPage:(id)sender;
 
 @end
