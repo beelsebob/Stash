@@ -12,8 +12,9 @@
 
 #define kFontSize           12.0
 
-#define kImageOriginXOffset 3
-#define kImageOriginYOffset 1
+#define kImageOriginXOffset           3
+#define kImageOriginYOffset           1
+#define kSymbolTypeImageOriginYOffset 3
 
 #define kTextOriginXOffset	2
 #define kTextOriginYOffset	2
@@ -113,25 +114,34 @@
         NSRect platformFrame;
         
         imageSize = [[self platformImage] size];
-        NSDivideRect(cellFrame, &platformFrame, &cellFrame, 3 + imageSize.width, NSMinXEdge);
+        NSDivideRect(cellFrame, &platformFrame, &cellFrame, kImageOriginXOffset + imageSize.width, NSMinXEdge);
         platformFrame.origin.x += kImageOriginXOffset;
-        platformFrame.origin.y -= kImageOriginYOffset;
+        platformFrame.origin.y += kImageOriginYOffset;
         platformFrame.size = imageSize;
-        platformFrame.origin.y += ceil(([controlView isFlipped] ? cellFrame.size.height + platformFrame.size.height : cellFrame.size.height - platformFrame.size.height) / 2);
 		
-		[[self platformImage] compositeToPoint:platformFrame.origin operation:NSCompositeSourceOver];
+        [[self platformImage] drawInRect:platformFrame
+                                fromRect:NSMakeRect(0.0f, 0.0f, imageSize.width, imageSize.height)
+                               operation:NSCompositeSourceOver
+                                fraction:1.0f
+                          respectFlipped:YES
+                                   hints:nil];
     }
     if ([self symbolTypeImage] != nil)
     {
         NSSize imageSize;
         NSRect symbolTypeFrame;
         imageSize = [[self symbolTypeImage] size];
-        NSDivideRect(cellFrame, &symbolTypeFrame, &cellFrame, 3 + imageSize.width, NSMinXEdge);
+        NSDivideRect(cellFrame, &symbolTypeFrame, &cellFrame, kImageOriginXOffset + imageSize.width, NSMinXEdge);
         symbolTypeFrame.origin.x += kImageOriginXOffset;
-        symbolTypeFrame.origin.y -= kImageOriginYOffset;
+        symbolTypeFrame.origin.y += kSymbolTypeImageOriginYOffset;
         symbolTypeFrame.size = imageSize;
-        symbolTypeFrame.origin.y += ceil(([controlView isFlipped] ? cellFrame.size.height + symbolTypeFrame.size.height : cellFrame.size.height - symbolTypeFrame.size.height) / 2);
-		[[self symbolTypeImage] compositeToPoint:symbolTypeFrame.origin operation:NSCompositeSourceOver];
+		
+        [[self symbolTypeImage] drawInRect:symbolTypeFrame
+                                  fromRect:NSMakeRect(0.0f, 0.0f, imageSize.width, imageSize.height)
+                                 operation:NSCompositeSourceOver
+                                  fraction:1.0f
+                            respectFlipped:YES
+                                     hints:nil];
     }
     
     NSRect newFrame = cellFrame;
