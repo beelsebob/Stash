@@ -156,12 +156,6 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 - (NSArray *)docsetRoots
 {
     NSMutableArray *docsetRoots = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask | NSLocalDomainMask | NSSystemDomainMask, YES) mutableCopy];
-/*    [docsetRoots addObject:@"/Applications/Xcode.app/Contents"];
-    NSError *err = nil;
-    for (NSString *platformRoot in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:@"/Applications/Xcode.app/Contents/Developer/Platforms" error:&err])
-    {
-        [docsetRoots addObject:[@"/Applications/Xcode.app/Contents/Developer/Platforms" stringByAppendingPathComponent:platformRoot]];
-    }*/
     return [docsetRoots copy];
 }
 
@@ -170,6 +164,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     if ([[self window] isVisible])
     {
         [[self window] close];
+        [[NSApplication sharedApplication] hide:self];
     }
     else
     {
