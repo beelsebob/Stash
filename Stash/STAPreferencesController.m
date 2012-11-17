@@ -158,7 +158,7 @@ NSString *descriptingStringFromChar(unichar c)
     [NSEvent removeMonitor:[self eventMonitor]];
     [self setEventMonitor:[NSEvent addLocalMonitorForEventsMatchingMask:NSKeyUpMask handler:^ NSEvent * (NSEvent *e)
                            {
-                               [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithUnsignedInteger:[e modifierFlags]]
+                               [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithUnsignedInteger:[e modifierFlags] & NSDeviceIndependentModifierFlagsMask]
                                                                          forKey:kModifierFlagsKey];
                                [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:[[e charactersIgnoringModifiers] characterAtIndex:0]]
                                                                          forKey:kKeyboardShortcutKey];
