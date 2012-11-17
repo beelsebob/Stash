@@ -10,8 +10,12 @@
 
 #import "STASymbolTableViewCell.h"
 
+#import "STAAppDelegate.h"
+
 #define kModifierFlagsKey @"Modifier Flags"
 #define kKeyboardShortcutKey @"Keyboard Shortcut"
+#define kHidesWhenNotActiveKey @"Hides When Not Active"
+#define kShowsIconWhereKey @"Shows Icon Where"
 #define kEnabledDocsetsKey @"Enabled Docsets"
 
 NSString *descriptingStringFromChar(unichar c);
@@ -98,6 +102,9 @@ NSString *descriptingStringFromChar(unichar c)
 {
     [self setupShortcutText];
     
+    [[self hideWhenNotActiveCheckbox] setState:[[NSUserDefaults standardUserDefaults] boolForKey:kHidesWhenNotActiveKey]];
+    [[self showIconMenuButton] selectItemAtIndex:[[NSUserDefaults standardUserDefaults] integerForKey:kShowsIconWhereKey]];
+    
     [[self window] makeKeyAndOrderFront:self];
     [NSApp activateIgnoringOtherApps:YES];
 }
@@ -107,9 +114,9 @@ NSString *descriptingStringFromChar(unichar c)
     NSMutableString *keyboardShortcutString = [NSMutableString stringWithString:@""];
     NSUInteger modifierFlags = [self keyboardShortcutModifierFlags];
     unichar command = 0x2318;
-    unichar alt = 0x2325;
-    unichar ctrl = 0x2303;
-    unichar shift = 0x21E7;
+    unichar alt     = 0x2325;
+    unichar ctrl    = 0x2303;
+    unichar shift   = 0x21E7;
     if (modifierFlags & NSControlKeyMask)
     {
         [keyboardShortcutString appendString:[NSString stringWithCharacters:&ctrl length:1]];
@@ -142,6 +149,8 @@ NSString *descriptingStringFromChar(unichar c)
     return [NSDictionary dictionaryWithObjectsAndKeys:
             [NSNumber numberWithUnsignedInteger:NSCommandKeyMask | NSControlKeyMask], kModifierFlagsKey,
             [NSNumber numberWithInt:' '], kKeyboardShortcutKey,
+            [NSNumber numberWithBool:YES], kHidesWhenNotActiveKey,
+            [NSNumber numberWithInt:STAIconShowingModeMenuBar], kShowsIconWhereKey,
             registeredDocsetNames, kEnabledDocsetsKey,
             nil];
 }
@@ -170,6 +179,53 @@ NSString *descriptingStringFromChar(unichar c)
                            }]];
 }
 
+- (IBAction)showIconChanged:(id)sender
+{
+    NSInteger selection = [[self showIconMenuButton] indexOfSelectedItem];
+    NSInteger oldSelection = [[NSUserDefaults standardUserDefaults] integerForKey:kShowsIconWhereKey];
+    [[NSUserDefaults standardUserDefaults] setInteger:selection
+                                               forKey:kShowsIconWhereKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    if (selection == STAIconShowingModeBoth || selection == STAIconShowingModeDock)
+    {
+        [[NSApplication sharedApplication] setActivationPolicy:NSApplicationActivationPolicyRegular];
+    }
+    else
+    {
+        [[NSApplication sharedApplication] setActivationPolicy:NSApplicationActivationPolicyAccessory];
+        if (oldSelection != selection)
+        {
+            NSAlert *alert = [NSAlert alertWithMessageText:@"Restart Required"
+                                             defaultButton:@"Okay"
+                                           alternateButton:nil
+                                               otherButton:nil
+                                 informativeTextWithFormat:@"In order to remove Stash from the dock, you must restart it."];
+            [alert runModal];
+        }
+    }
+    
+    STAAppDelegate *del = (STAAppDelegate *)[[NSApplication sharedApplication] delegate];
+    if (selection == STAIconShowingModeMenuBar || selection == STAIconShowingModeBoth)
+    {
+        [del setStatusItem:[[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength]];
+        [[del statusItem] setMenu:[del statusMenu]];
+        [[del statusItem] setTitle:@"Stash"];
+        [[del statusItem] setHighlightMode:YES];
+    }
+    else
+    {
+        [del setStatusItem:nil];
+    }
+}
+
+- (IBAction)hideWhenNotActiveChanged:(id)sender
+{
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:[[self hideWhenNotActiveCheckbox] state] == NSOnState]
+                                              forKey:kHidesWhenNotActiveKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 - (void)removeEventMonitor
 {
     [NSEvent removeMonitor:[self eventMonitor]];
@@ -179,6 +235,16 @@ NSString *descriptingStringFromChar(unichar c)
 - (BOOL)isMonitoringForEvents
 {
     return [self eventMonitor] != nil;
+}
+
+- (BOOL)appShouldHideWhenNotActive
+{
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kHidesWhenNotActiveKey];
+}
+
+- (STAIconShowingMode)iconMode
+{
+    return (STAIconShowingMode)[[NSUserDefaults standardUserDefaults] integerForKey:kShowsIconWhereKey];
 }
 
 - (NSArray *)registeredDocsets

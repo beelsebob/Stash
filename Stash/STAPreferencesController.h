@@ -10,6 +10,14 @@
 
 #import "STADocSet.h"
 
+typedef enum
+{
+    STAIconShowingModeMenuBar = 0,
+    STAIconShowingModeDock    = 1,
+    STAIconShowingModeBoth    = 2
+} STAIconShowingMode;
+
+
 @class STAPreferencesController;
 
 @protocol STAPreferencesDelegate <NSObject>
@@ -30,6 +38,10 @@
 @property (strong) IBOutlet NSTextField *shortcutText;
 @property (strong) IBOutlet NSTableView *docsetTable;
 @property (readonly) BOOL isMonitoringForEvents;
+@property (weak) IBOutlet NSButton *hideWhenNotActiveCheckbox;
+@property (weak) IBOutlet NSPopUpButton *showIconMenuButton;
+@property (readonly) BOOL appShouldHideWhenNotActive;
+@property (readonly) STAIconShowingMode iconMode;
 
 - (id)initWithNibNamed:(NSString *)nibName bundle:(NSBundle *)bundle;
 
@@ -38,5 +50,7 @@
 - (void)registerDocset:(STADocSet *)docset;
 
 - (IBAction)changeShortcut:(id)sender;
+- (IBAction)showIconChanged:(id)sender;
+- (IBAction)hideWhenNotActiveChanged:(id)sender;
 
 @end

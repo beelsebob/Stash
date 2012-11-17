@@ -22,6 +22,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 @property (strong) NSMutableArray *results;
 @property (strong) NSArray *sortedResults;
 @property (assign, getter=isFindUIShowing) BOOL findUIShowing;
+@property (weak) NSSearchField *selectedSearchField;
 
 - (void)readDocsets;
 - (void)showFindUI;
@@ -50,14 +51,23 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    [self setStatusItem:[[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength]];
-    [[self statusItem] setMenu:[self statusMenu]];
-    [[self statusItem] setTitle:@"Stash"];
-    [[self statusItem] setHighlightMode:YES];
-    
     [self setPreferencesController:[[STAPreferencesController alloc] initWithNibNamed:@"STAPreferencesController" bundle:nil]];
     [[self preferencesController] setDelegate:self];
 
+    STAIconShowingMode mode = [[self preferencesController] iconMode];
+    
+    if (mode == STAIconShowingModeBoth || mode == STAIconShowingModeMenuBar)
+    {
+        [self setStatusItem:[[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength]];
+        [[self statusItem] setMenu:[self statusMenu]];
+        [[self statusItem] setTitle:@"Stash"];
+        [[self statusItem] setHighlightMode:YES];
+    }
+    if (mode == STAIconShowingModeBoth || mode == STAIconShowingModeDock)
+    {
+        [[NSApplication sharedApplication] setActivationPolicy:NSApplicationActivationPolicyRegular];
+    }
+    
     unichar c = [[self preferencesController] keyboardShortcutCharacter];
     [[self openStashMenuItem] setKeyEquivalent:[NSString stringWithCharacters:&c length:1]];
     [[self openStashMenuItem] setKeyEquivalentModifierMask:[[self preferencesController] keyboardShortcutModifierFlags]];
@@ -76,6 +86,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     };
     
     [NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyUpMask handler:handler];
+    
     [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyUpMask handler:^ NSEvent * (NSEvent *e) { handler(e); return e; }];
     [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyDownMask handler:^ NSEvent * (NSEvent *e)
      {
@@ -120,7 +131,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
          }
          return e;
      }];
-    
+ 
     [self readDocsets];
 }
 
@@ -145,9 +156,12 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 - (IBAction)hideSearchBar:(id)sender
 {
-    [[self window] makeFirstResponder:[self searchField]];
     if ([self isFindUIShowing])
     {
+        if ([self selectedSearchField] != [self searchField])
+        {
+            [[self window] makeFirstResponder:[self searchField]];
+        }
         [self setFindUIShowing:NO];
         [NSAnimationContext runAnimationGroup:^ (NSAnimationContext *ctx)
          {
@@ -290,7 +304,10 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 - (void)windowDidResignKey:(NSNotification *)notification
 {
-    [[self window] close];
+    if ([[self preferencesController] appShouldHideWhenNotActive])
+    {
+        [[self window] close];
+    }
 }
 
 - (IBAction)search:(id)sender
@@ -299,7 +316,8 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     [self hideSearchBar:self];
     [self setCurrentSearchString:searchString];
     [self setResults:[NSMutableArray array]];
-    [[self resultsTable] deselectAll:self];
+    [self setSortedResults:[NSArray array]];
+    [[self resultsTable] reloadData];
     for (STADocSet *docSet in [[self preferencesController] enabledDocsets])
     {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^()
@@ -400,6 +418,15 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 - (void)webView:(WebView *)sender didReceiveTitle:(NSString *)title forFrame:(WebFrame *)frame
 {
     [[self titleView] setStringValue:title];
+}
+
+- (BOOL)control:(NSControl *)control textShouldBeginEditing:(NSText *)fieldEditor
+{
+    if ([control isKindOfClass:[NSSearchField class]])
+    {
+        [self setSelectedSearchField:(NSSearchField *)control];
+    }
+    return YES;
 }
 
 @end
