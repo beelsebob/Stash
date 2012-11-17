@@ -188,7 +188,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 - (IBAction)search:(id)sender
 {
-    NSString *searchString = [[sender stringValue] lowercaseString];
+    NSString *searchString = [[[self searchField] stringValue] lowercaseString];
     [self setCurrentSearchString:searchString];
     [self setResults:[NSMutableArray array]];
     [[self resultsTable] deselectAll:self];
@@ -199,6 +199,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                            @autoreleasepool
                            {
                                [docSet search:searchString
+                                       method:[[self searchMethodSelector] selectedRow] == 0 ? STASearchMethodPrefix : STASearchMethodContains
                                      onResult:^(STASymbol *symbol)
                                 {
                                     dispatch_sync(dispatch_get_main_queue(), ^()
@@ -229,6 +230,11 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 - (IBAction)quit:(id)sender
 {
     [NSApp terminate:sender];
+}
+
+- (IBAction)setSearchMethod:(id)sender
+{
+    [self search:sender];
 }
 
 #pragma mark - Table View Data Source

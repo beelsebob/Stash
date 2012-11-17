@@ -28,7 +28,7 @@ typedef enum
 + (id)docSetWithURL:(NSURL *)url cachePath:(NSString *)cachePath onceIndexed:(void(^)(STADocSet *))completion;
 - (id)initWithURL:(NSURL *)url cachePath:(NSString *)cachePath onceIndexed:(void(^)(STADocSet *))completion;
 
-- (void)search:(NSString *)searchString onResult:(void(^)(STASymbol *))result;
+- (void)search:(NSString *)searchString method:(STASearchMethod)method onResult:(void(^)(STASymbol *))result;
 
 - (void)unload;
 

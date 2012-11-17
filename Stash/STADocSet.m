@@ -164,7 +164,7 @@
     }
 }
 
-- (void)search:(NSString *)searchString onResult:(void(^)(STASymbol *))result
+- (void)search:(NSString *)searchString method:(STASearchMethod)method onResult:(void(^)(STASymbol *))result
 {
     if (![self isLoaded])
     {
@@ -172,7 +172,7 @@
     }
     for (STASymbol *s in [self symbols])
     {
-        if ([s matches:searchString])
+        if ([s matches:searchString method:method])
         {
             result(s);
         }

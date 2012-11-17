@@ -129,9 +129,15 @@
     }
 }
 
-- (BOOL)matches:(NSString *)searchString
+- (BOOL)matches:(NSString *)searchString method:(STASearchMethod)method
 {
-    return [[_symbolName lowercaseString] hasPrefix:searchString];
+    switch (method)
+    {
+        case STASearchMethodPrefix:
+            return [[_symbolName lowercaseString] hasPrefix:searchString];
+        case STASearchMethodContains:
+            return [[_symbolName lowercaseString] rangeOfString:searchString].location != NSNotFound;
+    }
 }
 
 - (NSComparisonResult)compare:(id)other

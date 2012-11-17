@@ -41,6 +41,12 @@ typedef enum : unsigned char
     STASymbolTypeUnknown
 } STASymbolType;
 
+typedef enum
+{
+    STASearchMethodPrefix,
+    STASearchMethodContains
+} STASearchMethod;
+
 STALanguage STALanguageFromNSString(NSString *languageString);
 STASymbolType STASymbolTypeFromNSString(NSString *symbolTypeString);
 
@@ -58,6 +64,6 @@ STASymbolType STASymbolTypeFromNSString(NSString *symbolTypeString);
 - (id)initWithLanguageString:(NSString *)language symbolTypeString:(NSString *)symbolType symbolName:(NSString *)symbolName url:(NSURL *)url docSet:(STADocSet *)docSet;
 - (id)initWithLanguageString:(NSString *)language symbolTypeString:(NSString *)symbolType symbolName:(NSString *)symbolName parentName:(NSString *)parentName url:(NSURL *)url docSet:(STADocSet *)docSet;
 
-- (BOOL)matches:(NSString *)searchString;
+- (BOOL)matches:(NSString *)searchString method:(STASearchMethod)method;
 
 @end

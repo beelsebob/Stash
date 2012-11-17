@@ -22,10 +22,12 @@
 @property (strong) IBOutlet NSTextField *titleView;
 @property (strong) IBOutlet NSSearchField *searchField;
 @property (strong) STAPreferencesController *preferencesController;
+@property (weak) IBOutlet NSMatrix *searchMethodSelector;
 
 - (IBAction)toggleStashWindow:(id)sender;
 - (IBAction)search:(id)sender;
 - (IBAction)openPreferences:(id)sender;
 - (IBAction)quit:(id)sender;
+- (IBAction)setSearchMethod:(id)sender;
 
 @end
