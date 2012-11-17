@@ -248,7 +248,6 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
         STASymbol *symbol = [[self sortedResults] objectAtIndex:row];
         NSURLRequest *request = [NSURLRequest requestWithURL:[symbol url]];
         [[[self resultWebView] mainFrame] loadRequest:request];
-        [[self titleView] setStringValue:[symbol symbolName]];
     }
 }
 
@@ -280,6 +279,11 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     unichar c = [[self preferencesController] keyboardShortcutCharacter];
     [[self openStashMenuItem] setKeyEquivalent:[NSString stringWithCharacters:&c length:1]];
     [[self openStashMenuItem] setKeyEquivalentModifierMask:[[self preferencesController] keyboardShortcutModifierFlags]];
+}
+
+- (void)webView:(WebView *)sender didReceiveTitle:(NSString *)title forFrame:(WebFrame *)frame
+{
+    [[self titleView] setStringValue:title];
 }
 
 @end
