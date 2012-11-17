@@ -11,7 +11,7 @@
 
 #import "STAPreferencesController.h"
 
-@interface STAAppDelegate : NSObject <NSApplicationDelegate, NSTableViewDataSource, NSTableViewDelegate, STAPreferencesDelegate>
+@interface STAAppDelegate : NSResponder <NSApplicationDelegate, NSTableViewDataSource, NSTableViewDelegate, STAPreferencesDelegate>
 
 @property (assign) IBOutlet NSWindow *window;
 @property (strong) IBOutlet NSMenu *statusMenu;

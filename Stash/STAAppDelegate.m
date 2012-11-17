@@ -67,6 +67,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
             {
                 [self toggleStashWindow:self];
             }
+            
         }
     };
     
@@ -169,9 +170,15 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     else
     {
         [[self window] makeKeyAndOrderFront:self];
+        [[self window] setNextResponder:self];
         [[self searchField] selectText:self];
         [NSApp activateIgnoringOtherApps:YES];
     }
+}
+
+- (void)cancelOperation:(id)sender
+{
+    [self toggleStashWindow:sender];
 }
 
 - (void)windowDidResignKey:(NSNotification *)notification
