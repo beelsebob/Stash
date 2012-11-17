@@ -61,7 +61,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     {
         if (![[self preferencesController] isMonitoringForEvents])
         {
-            NSUInteger modifiers = [e modifierFlags];
+            NSUInteger modifiers = [e modifierFlags] & NSDeviceIndependentModifierFlagsMask;
             NSUInteger desiredModifiers = [[self preferencesController] keyboardShortcutModifierFlags];
             if (modifiers == desiredModifiers && [[e charactersIgnoringModifiers] characterAtIndex:0] == [[self preferencesController] keyboardShortcutCharacter])
             {
