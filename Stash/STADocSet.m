@@ -117,45 +117,48 @@
             {
                 NSError *parseError = nil;
                 HTMLParser *parser = [[HTMLParser alloc] initWithContentsOfURL:subUrl error:&parseError];
-                NSString *path = [subUrl absoluteString];
-
-                for (HTMLNode *anchor in [[parser body] findChildTags:@"a"])
+                if (nil == parseError)
                 {
-                    NSString *n = [anchor getAttributeNamed:@"name"];
-                    if (nil != n)
+                    NSString *path = [subUrl absoluteString];
+                    
+                    for (HTMLNode *anchor in [[parser body] findChildTags:@"a"])
                     {
-                        NSScanner *scanner = [NSScanner scannerWithString:n];
-                        NSString *dump;
-                        NSString *language;
-                        NSString *symbolType;
-                        NSString *parent;
-                        NSString *symbol;
-                        BOOL success = [scanner scanString:@"//apple_ref/" intoString:&dump];
-                        if (!success) { continue; }
-                        success = [scanner scanUpToString:@"/" intoString:&language];
-                        [scanner setScanLocation:[scanner scanLocation] + 1];
-                        if (!success || [language isEqualToString:@"doc"]) { continue; }
-                        success = [scanner scanUpToString:@"/" intoString:&symbolType];
-                        [scanner setScanLocation:[scanner scanLocation] + 1];
-                        if (!success) { continue; }
-                        success = [scanner scanUpToString:@"/" intoString:&parent];
-                        STASymbol *s = nil;
-                        NSString *fullPath = [path stringByAppendingFormat:@"#%@", n];
-                        if ([scanner scanLocation] < [n length] - 1)
+                        NSString *n = [anchor getAttributeNamed:@"name"];
+                        if (nil != n)
                         {
+                            NSScanner *scanner = [NSScanner scannerWithString:n];
+                            NSString *dump;
+                            NSString *language;
+                            NSString *symbolType;
+                            NSString *parent;
+                            NSString *symbol;
+                            BOOL success = [scanner scanString:@"//apple_ref/" intoString:&dump];
+                            if (!success) { continue; }
+                            success = [scanner scanUpToString:@"/" intoString:&language];
                             [scanner setScanLocation:[scanner scanLocation] + 1];
-                            success = [scanner scanUpToString:@"/" intoString:&symbol];
-                            s = [[STASymbol alloc] initWithLanguageString:language symbolTypeString:symbolType symbolName:symbol parentName:parent url:[NSURL URLWithString:fullPath] docSet:self];
-                        }
-                        else
-                        {
-                            s = [[STASymbol alloc] initWithLanguageString:language symbolTypeString:symbolType symbolName:parent url:[NSURL URLWithString:fullPath] docSet:self];
-                        }
-                        
-                        STASymbolType t = [s symbolType];
-                        if (t != STASymbolTypeBinding && t != STASymbolTypeTag && t != STASymbolTypeUnknown && [s language] != STALanguageUnknown)
-                        {
-                            [[self symbols] addObject:s];
+                            if (!success || [language isEqualToString:@"doc"]) { continue; }
+                            success = [scanner scanUpToString:@"/" intoString:&symbolType];
+                            [scanner setScanLocation:[scanner scanLocation] + 1];
+                            if (!success) { continue; }
+                            success = [scanner scanUpToString:@"/" intoString:&parent];
+                            STASymbol *s = nil;
+                            NSString *fullPath = [path stringByAppendingFormat:@"#%@", n];
+                            if ([scanner scanLocation] < [n length] - 1)
+                            {
+                                [scanner setScanLocation:[scanner scanLocation] + 1];
+                                success = [scanner scanUpToString:@"/" intoString:&symbol];
+                                s = [[STASymbol alloc] initWithLanguageString:language symbolTypeString:symbolType symbolName:symbol parentName:parent url:[NSURL URLWithString:fullPath] docSet:self];
+                            }
+                            else
+                            {
+                                s = [[STASymbol alloc] initWithLanguageString:language symbolTypeString:symbolType symbolName:parent url:[NSURL URLWithString:fullPath] docSet:self];
+                            }
+                            
+                            STASymbolType t = [s symbolType];
+                            if (t != STASymbolTypeBinding && t != STASymbolTypeTag && t != STASymbolTypeUnknown && [s language] != STALanguageUnknown)
+                            {
+                                [[self symbols] addObject:s];
+                            }
                         }
                     }
                 }

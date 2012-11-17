@@ -215,23 +215,28 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
             }
             if (nil == indexedDocset)
             {
-                numDocsetsIndexing++;
-                indexedDocset = [STADocSet docSetWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@", [docsetDirectory stringByAppendingPathComponent:docset]]]
-                                               cachePath:docsetCachePath
-                                             onceIndexed:^(STADocSet *idx)
-                                 {
-                                     [NSKeyedArchiver archiveRootObject:idx toFile:docsetCachePath];
-                                     numDocsetsIndexed++;
-                                     if (numDocsetsIndexed == numDocsetsIndexing && finishedSearchingForDocsets)
+                NSString *docsetPath = [docsetDirectory stringByAppendingPathComponent:docset];
+                BOOL docsetExists = [[NSFileManager defaultManager] fileExistsAtPath:docsetPath isDirectory:&isDir];
+                if (docsetExists & isDir)
+                {
+                    numDocsetsIndexing++;
+                    indexedDocset = [STADocSet docSetWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@", docsetPath]]
+                                                   cachePath:docsetCachePath
+                                                 onceIndexed:^(STADocSet *idx)
                                      {
-                                         dispatch_async(dispatch_get_main_queue(), ^()
-                                                        {
-                                                            [[self searchField] setEnabled:YES];
-                                                            [[self searchField] selectText:self];
-                                                            [[self titleView] setStringValue:@""];
-                                                        });
-                                     }
-                                 }];
+                                         [NSKeyedArchiver archiveRootObject:idx toFile:docsetCachePath];
+                                         numDocsetsIndexed++;
+                                         if (numDocsetsIndexed == numDocsetsIndexing && finishedSearchingForDocsets)
+                                         {
+                                             dispatch_async(dispatch_get_main_queue(), ^()
+                                                            {
+                                                                [[self searchField] setEnabled:YES];
+                                                                [[self searchField] selectText:self];
+                                                                [[self titleView] setStringValue:@""];
+                                                            });
+                                         }
+                                     }];
+                }
             }
             [[self preferencesController] registerDocset:indexedDocset];
             [[self docsets] addObject:indexedDocset];
@@ -270,6 +275,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
         [[self window] makeKeyAndOrderFront:self];
         [[self window] setNextResponder:self];
         [[self window] makeFirstResponder:[self searchField]];
+        NSLog(@"Selecting text");
         [[self searchField] selectText:self];
         [NSApp activateIgnoringOtherApps:YES];
     }
