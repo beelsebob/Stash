@@ -17,20 +17,23 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 @interface STAAppDelegate () <NSWindowDelegate>
 
-@property (strong) NSMutableArray *docsets;
+@property (copy) NSArray *docsets;
 @property (copy) NSString *currentSearchString;
 @property (strong) NSMutableArray *results;
 @property (strong) NSArray *sortedResults;
 @property (assign, getter=isFindUIShowing) BOOL findUIShowing;
 @property (weak) NSSearchField *selectedSearchField;
 
-- (void)readDocsets;
+- (void)readDocsetsWithContinuation:(void(^)(void))cont;
 - (void)showFindUI;
 - (void)searchAgain:(BOOL)backwards;
 
 @end
 
 @implementation STAAppDelegate
+{
+    NSMutableArray *_docsets;
+}
 
 @synthesize window = _window;
 @synthesize statusMenu = _statusMenu;
@@ -48,6 +51,19 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 @synthesize sortedResults = _sortedResults;
 
 @synthesize findUIShowing = _findUIShowing;
+
+- (NSArray *)docsets
+{
+    return [_docsets copy];
+}
+
+- (void)setDocsets:(NSArray *)docsets
+{
+    if (docsets != _docsets)
+    {
+        _docsets = [docsets mutableCopy];
+    }
+}
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
@@ -86,7 +102,6 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     };
     
     [NSEvent addGlobalMonitorForEventsMatchingMask:NSKeyUpMask handler:handler];
-    
     [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyUpMask handler:^ NSEvent * (NSEvent *e) { handler(e); return e; }];
     [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyDownMask handler:^ NSEvent * (NSEvent *e)
      {
@@ -132,7 +147,20 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
          return e;
      }];
  
-    [self readDocsets];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^()
+                   {
+                       [[self searchField] setEnabled:NO];
+                       [[self titleView] setStringValue:@"Stash is Loading, Please Wait..."];
+                       [self readDocsetsWithContinuation:^()
+                        {
+                            dispatch_async(dispatch_get_main_queue(), ^()
+                                           {
+                                               [[self searchField] setEnabled:YES];
+                                               [[self searchField] selectText:self];
+                                               [[self titleView] setStringValue:@""];
+                                           });
+                        }];
+                   });
 }
 
 - (void)showFindUI
@@ -189,12 +217,34 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                                wrap:YES];
 }
 
-- (void)readDocsets
+- (void)readDocsetsWithContinuation:(void(^)(void))cont
+{
+    [self setDocsets:@[]];
+    
+    [self readExistingIndexes];
+    dispatch_async(dispatch_get_main_queue(), ^()
+                   {
+                       [[self titleView] setStringValue:@"Stash is Indexing, Please Wait..."];
+                   });
+    [self refreshExistingBookmarksWithContinuation:^()
+     {
+         if ([[self docsets] count] == 0)
+         {
+             NSArray *docsetRoots = [self docsetRoots];
+             [self indexDocsetsInRoots:docsetRoots withContinuation:cont];
+         }
+         else
+         {
+             cont();
+         }
+     }];
+}
+
+- (void)readExistingIndexes
 {
     NSError *err;
-    NSArray *docsetRoots = [self docsetRoots];
-    NSString *pathForArchive = [[NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES) objectAtIndex:0] stringByAppendingPathComponent:@"Stash"];
     BOOL isDir;
+    NSString *pathForArchive = [self pathForArchive];
     BOOL appSupportDirectoryIsPresent = [[NSFileManager defaultManager] fileExistsAtPath:pathForArchive isDirectory:&isDir];
     if (appSupportDirectoryIsPresent && !isDir)
     {
@@ -210,51 +260,117 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
         }
     }
     
-    [self setDocsets:[NSMutableArray arrayWithCapacity:[docsetRoots count]]];
+    NSArray *appSupportContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:pathForArchive error:&err];
+    NSMutableArray *docsets = [NSMutableArray array];
+    for (NSString *indexPath in appSupportContents)
+    {
+        if ([[indexPath pathExtension] isEqualToString:@"stashidx"])
+        {
+            STADocSet *docset = [NSKeyedUnarchiver unarchiveObjectWithFile:[pathForArchive stringByAppendingPathComponent:indexPath]];
+            if (nil != docset)
+            {
+                [docset setCachePath:indexPath];
+                [docsets addObject:docset];
+                [[self preferencesController] registerDocset:docset];
+            }
+        }
+    }
+    [self setDocsets:docsets];
+}
+
+#define STADocumentationBookmarksKey @"DocsBookmarks"
+
+- (void)refreshExistingBookmarksWithContinuation:(void(^)(void))cont
+{
+    NSArray *documentationBookmarks = [[NSUserDefaults standardUserDefaults] arrayForKey:STADocumentationBookmarksKey];
+    for (NSData *bookmark in documentationBookmarks)
+    {
+        BOOL stale = NO;
+        NSError *err;
+        NSURL *url = [NSURL URLByResolvingBookmarkData:bookmark
+                                               options:NSURLBookmarkResolutionWithSecurityScope
+                                         relativeToURL:nil
+                                   bookmarkDataIsStale:&stale
+                                                 error:&err];
+        [url startAccessingSecurityScopedResource];
+    }
+    cont();
+}
+
+- (void)indexDocsetsInRoots:(NSArray *)roots withContinuation:(void(^)(void))cont
+{
+    [self indexDocsetsInRoots:roots index:0 selectedRoots:[NSArray array] withContinuation:cont];
+}
+
+- (void)indexDocsetsInRoots:(NSArray *)originalRoots index:(NSUInteger)idx selectedRoots:(NSArray *)selectedRoots withContinuation:(void(^)(void))cont
+{
+    if (idx < [originalRoots count])
+    {
+        NSString *lastRoot = [originalRoots objectAtIndex:idx];
+        NSString *lastPath = [[[[lastRoot stringByAppendingPathComponent:@"Developer"] stringByAppendingPathComponent:@"Shared"] stringByAppendingPathComponent:@"Documentation"] stringByAppendingPathComponent:@"DocSets"];
+        dispatch_async(dispatch_get_main_queue(), ^()
+                       {
+                           [self requestAccessToDirectory:lastPath
+                                             continuation:^(NSURL *selectedRoot)
+                            {
+                                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^()
+                                               {
+                                                   NSError *err = nil;
+                                                   NSData *bookmark = [selectedRoot bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope | NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess
+                                                                             includingResourceValuesForKeys:@[]
+                                                                                              relativeToURL:nil
+                                                                                                      error:&err];
+                                                   NSArray *documentationBookmarks = [[NSUserDefaults standardUserDefaults] arrayForKey:STADocumentationBookmarksKey];
+                                                   documentationBookmarks = documentationBookmarks ? : @[];
+                                                   documentationBookmarks = [documentationBookmarks containsObject:bookmark] ? documentationBookmarks : [documentationBookmarks arrayByAddingObject:bookmark];
+                                                   [[NSUserDefaults standardUserDefaults] setObject:documentationBookmarks forKey:STADocumentationBookmarksKey];
+                                                   [[NSUserDefaults standardUserDefaults] synchronize];
+                                                   
+                                                   [self indexDocsetsInRoots:originalRoots index:idx+1 selectedRoots:[selectedRoots arrayByAddingObject:selectedRoot] withContinuation:cont];
+                                               });
+                            }];
+                       });
+    }
+    else
+    {
+        [self indexDocsetsWithPermissionInRoots:selectedRoots withContinuation:cont];
+    }
+}
+
+- (void)indexDocsetsWithPermissionInRoots:(NSArray *)roots withContinuation:(void(^)(void))cont
+{
+    NSError *err;
+    BOOL isDir;
     __block NSUInteger numDocsetsIndexing = 0;
     __block NSUInteger numDocsetsIndexed = 0;
     __block BOOL finishedSearchingForDocsets = NO;
-    [[self searchField] setEnabled:NO];
-    for (NSString *path in docsetRoots)
+    for (NSURL *root in roots)
     {
-        NSString *docsetDirectory = [[[[path stringByAppendingPathComponent:@"Developer"] stringByAppendingPathComponent:@"Shared"] stringByAppendingPathComponent:@"Documentation"] stringByAppendingPathComponent:@"DocSets"];
-        for (NSString *docset in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:docsetDirectory error:&err])
+        for (NSURL *docsetURL in [[NSFileManager defaultManager] contentsOfDirectoryAtURL:root
+                                                               includingPropertiesForKeys:[NSArray array]
+                                                                                  options:0
+                                                                                    error:&err])
         {
-            NSString *docsetPath = [docsetDirectory stringByAppendingPathComponent:docset];
-            BOOL docsetExists = [[NSFileManager defaultManager] fileExistsAtPath:docsetPath isDirectory:&isDir];
+            BOOL docsetExists = [[NSFileManager defaultManager] fileExistsAtPath:[docsetURL path] isDirectory:&isDir];
             if (docsetExists && isDir)
             {
-                STADocSet *indexedDocset = nil;
-                NSString *docsetCachePath = [[pathForArchive stringByAppendingPathComponent:docset] stringByAppendingPathExtension:@"stashidx"];
-                if ([[NSFileManager defaultManager] fileExistsAtPath:docsetCachePath isDirectory:&isDir])
-                {
-                    indexedDocset = [NSKeyedUnarchiver unarchiveObjectWithFile:docsetCachePath];
-                    [indexedDocset setCachePath:docsetCachePath];
-                }
-                if (nil == indexedDocset)
-                {
-                    numDocsetsIndexing++;
-                    indexedDocset = [STADocSet docSetWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"file://%@", docsetPath]]
-                                                   cachePath:docsetCachePath
-                                                 onceIndexed:^(STADocSet *idx)
-                                     {
-                                         [NSKeyedArchiver archiveRootObject:idx toFile:docsetCachePath];
-                                         numDocsetsIndexed++;
-                                         if (numDocsetsIndexed == numDocsetsIndexing && finishedSearchingForDocsets)
-                                         {
-                                             dispatch_async(dispatch_get_main_queue(), ^()
-                                                            {
-                                                                [[self searchField] setEnabled:YES];
-                                                                [[self searchField] selectText:self];
-                                                                [[self titleView] setStringValue:@""];
-                                                            });
-                                         }
-                                     }];
-                }
+                NSString *docsetCachePath = [[[self pathForArchive] stringByAppendingPathComponent:[docsetURL lastPathComponent]] stringByAppendingPathExtension:@"stashidx"];
+                numDocsetsIndexing++;
+                STADocSet *indexedDocset = [STADocSet docSetWithURL:docsetURL
+                                                          cachePath:docsetCachePath
+                                                        onceIndexed:^(STADocSet *idx)
+                                            {
+                                                [NSKeyedArchiver archiveRootObject:idx toFile:docsetCachePath];
+                                                numDocsetsIndexed++;
+                                                if (numDocsetsIndexed == numDocsetsIndexing && finishedSearchingForDocsets)
+                                                {
+                                                    cont();
+                                                }
+                                            }];
                 if (nil != indexedDocset)
                 {
                     [[self preferencesController] registerDocset:indexedDocset];
-                    [[self docsets] addObject:indexedDocset];
+                    [_docsets addObject:indexedDocset];
                     if (![[[self preferencesController] enabledDocsets] containsObject:indexedDocset])
                     {
                         [indexedDocset unload];
@@ -266,17 +382,60 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     finishedSearchingForDocsets = YES;
     if (numDocsetsIndexed == numDocsetsIndexing)
     {
-        [[self searchField] setEnabled:YES];
+        cont();
     }
-    else
-    {
-        [[self titleView] setStringValue:@"Stash is Indexing, Please Wait..."];
-    }
+}
+
+- (NSString *)pathForArchive
+{
+    return [[NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES) objectAtIndex:0] stringByAppendingPathComponent:@"Stash"];
+}
+
+- (void)requestAccessToDirectory:(NSString *)directory continuation:(void(^)(NSURL *))cont
+{
+    NSURL *requiredURL = [NSURL URLWithString:[NSString stringWithFormat:@"file://%@", directory]];
+    NSOpenPanel *panel = [NSOpenPanel openPanel];
+    [panel setCanChooseDirectories:YES];
+    [panel setCanChooseFiles:NO];
+    [panel setAllowsMultipleSelection:NO];
+    [panel setResolvesAliases:NO];
+    [panel setTitle:@"Docsets Directory"];
+    [panel setPrompt:@"Choose Docsets"];
+    [panel setMessage:@"Stash requires access to Xcode's documentation, please select the DocSets directory."];
+    [panel setShowsHiddenFiles:YES];
+    [panel setDirectoryURL:requiredURL];
+    [panel beginWithCompletionHandler:^ (NSInteger result)
+     {
+         if (result == NSFileHandlingPanelOKButton)
+         {
+             cont([panel URL]);
+         }
+         else
+         {
+             NSAlert *alert = [NSAlert alertWithMessageText:@"Stash Requires Access"
+                                              defaultButton:@"Okay"
+                                            alternateButton:nil
+                                                otherButton:@"Quit"
+                                  informativeTextWithFormat:@"Stash can not function without access to Xcode's documentation.  Please select the DocSets directory."];
+             NSInteger result = [alert runModal];
+             switch (result)
+             {
+                 case NSAlertDefaultReturn:
+                     [self requestAccessToDirectory:directory continuation:cont];
+                     break;
+                 case NSAlertOtherReturn:
+                     [[NSApplication sharedApplication] stop:self];
+                     break;
+                 default:
+                     break;
+             }
+         }
+     }];
 }
 
 - (NSArray *)docsetRoots
 {
-    NSMutableArray *docsetRoots = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask | NSLocalDomainMask | NSSystemDomainMask, YES) mutableCopy];
+    NSMutableArray *docsetRoots = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) mutableCopy];
     return [docsetRoots copy];
 }
 

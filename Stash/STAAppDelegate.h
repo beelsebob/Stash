@@ -31,6 +31,7 @@
 - (IBAction)quit:(id)sender;
 - (IBAction)setSearchMethod:(id)sender;
 - (IBAction)hideSearchBar:(id)sender;
+- (IBAction)showFindUI;
 - (IBAction)searchWithinPage:(id)sender;
 
 @end
