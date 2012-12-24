@@ -19,6 +19,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 @property (copy) NSArray *indexingDocsets;
 @property (copy) NSArray *docsets;
+@property (assign,getter=isWaitingForDocsetInput) BOOL waitingForDocsetInput;
 @property (copy) NSString *currentSearchString;
 @property (strong) NSMutableArray *results;
 @property (strong) NSArray *sortedResults;
@@ -91,7 +92,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     
     void(^handler)(NSEvent *) = ^(NSEvent *e)
     {
-        if (![[self preferencesController] isMonitoringForEvents])
+        if (![[self preferencesController] isMonitoringForEvents] && ![self isWaitingForDocsetInput])
         {
             NSUInteger modifiers = [e modifierFlags] & NSDeviceIndependentModifierFlagsMask;
             NSUInteger desiredModifiers = [[self preferencesController] keyboardShortcutModifierFlags];
@@ -352,6 +353,13 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     NSError *err;
     BOOL isDir;
     __block BOOL finishedSearchingForDocsets = NO;
+    dispatch_async(dispatch_get_main_queue(), ^()
+                   {
+                       if (![[self window] isVisible])
+                       {
+                           [self toggleStashWindow:self];
+                       }
+                   });
     for (NSURL *root in roots)
     {
         for (NSURL *docsetURL in [[NSFileManager defaultManager] contentsOfDirectoryAtURL:root
@@ -424,6 +432,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 {
     NSURL *requiredURL = [NSURL URLWithString:[NSString stringWithFormat:@"file://%@", directory]];
     NSOpenPanel *panel = [NSOpenPanel openPanel];
+    [self setWaitingForDocsetInput:YES];
     [panel setCanChooseDirectories:YES];
     [panel setCanChooseFiles:NO];
     [panel setAllowsMultipleSelection:NO];
@@ -437,6 +446,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
      {
          if (result == NSFileHandlingPanelOKButton)
          {
+             [self setWaitingForDocsetInput:NO];
              cont([panel URL]);
          }
          else
