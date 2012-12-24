@@ -231,6 +231,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 }
 
 #define STADocumentationBookmarksKey @"DocsBookmarks"
+#define STADocumentationURLsKey @"DocsURLs"
 
 - (IBAction)addDocumentation:(id)sender
 {
@@ -253,6 +254,15 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                                 documentationBookmarks = documentationBookmarks ? : @[];
                                 documentationBookmarks = [documentationBookmarks containsObject:bookmark] ? documentationBookmarks : [documentationBookmarks arrayByAddingObject:bookmark];
                                 [[NSUserDefaults standardUserDefaults] setObject:documentationBookmarks forKey:STADocumentationBookmarksKey];
+                                [[NSUserDefaults standardUserDefaults] synchronize];
+                            }
+                            else
+                            {
+                                NSArray *documentationURLs = [[NSUserDefaults standardUserDefaults] arrayForKey:STADocumentationURLsKey];
+                                documentationURLs = documentationURLs ? : @[];
+                                NSString *urlString = [selectedRoot absoluteString];
+                                documentationURLs = [documentationURLs containsObject:urlString] ? documentationURLs : [documentationURLs arrayByAddingObject:urlString];
+                                [[NSUserDefaults standardUserDefaults] setObject:documentationURLs forKey:STADocumentationURLsKey];
                                 [[NSUserDefaults standardUserDefaults] synchronize];
                             }
                             [self indexDocsetsWithPermissionInRoots:@[lastRoot] withContinuation:^(){}];
@@ -334,21 +344,35 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 - (void)refreshExistingBookmarksWithContinuation:(void(^)(void))cont
 {
-    NSArray *documentationBookmarks = [[NSUserDefaults standardUserDefaults] arrayForKey:STADocumentationBookmarksKey];
-    NSMutableArray *bookmarkURLs = [NSMutableArray arrayWithCapacity:[documentationBookmarks count]];
-    for (NSData *bookmark in documentationBookmarks)
+    NSDictionary* environ = [[NSProcessInfo processInfo] environment];
+    BOOL inSandbox = (nil != [environ objectForKey:@"APP_SANDBOX_CONTAINER_ID"]);
+    NSMutableArray *urls = [NSMutableArray array];
+    if (inSandbox)
     {
-        BOOL stale = NO;
-        NSError *err;
-        NSURL *url = [NSURL URLByResolvingBookmarkData:bookmark
-                                               options:NSURLBookmarkResolutionWithSecurityScope
-                                         relativeToURL:nil
-                                   bookmarkDataIsStale:&stale
-                                                 error:&err];
-        [url startAccessingSecurityScopedResource];
-        [bookmarkURLs addObject:url];
+        NSArray *documentationBookmarks = [[NSUserDefaults standardUserDefaults] arrayForKey:STADocumentationBookmarksKey];
+        for (NSData *bookmark in documentationBookmarks)
+        {
+            BOOL stale = NO;
+            NSError *err = nil;
+            NSURL *url = [NSURL URLByResolvingBookmarkData:bookmark
+                                                   options:NSURLBookmarkResolutionWithSecurityScope
+                                             relativeToURL:nil
+                                       bookmarkDataIsStale:&stale
+                                                     error:&err];
+            [url startAccessingSecurityScopedResource];
+            [urls addObject:url];
+        }
     }
-    [self indexDocsetsWithPermissionInRoots:bookmarkURLs withContinuation:cont];
+    else
+    {
+        NSArray *documentationURLs = [[NSUserDefaults standardUserDefaults] arrayForKey:STADocumentationURLsKey];
+        for (NSString *urlString in documentationURLs)
+        {
+            NSURL *url = [NSURL URLWithString:urlString];
+            [urls addObject:url];
+        }
+    }
+    [self indexDocsetsWithPermissionInRoots:urls withContinuation:cont];
 }
 
 - (void)indexDocsetsInRoots:(NSArray *)roots withContinuation:(void(^)(void))cont
@@ -380,6 +404,15 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                                                        documentationBookmarks = documentationBookmarks ? : @[];
                                                        documentationBookmarks = [documentationBookmarks containsObject:bookmark] ? documentationBookmarks : [documentationBookmarks arrayByAddingObject:bookmark];
                                                        [[NSUserDefaults standardUserDefaults] setObject:documentationBookmarks forKey:STADocumentationBookmarksKey];
+                                                       [[NSUserDefaults standardUserDefaults] synchronize];
+                                                   }
+                                                   else
+                                                   {
+                                                       NSArray *documentationURLs = [[NSUserDefaults standardUserDefaults] arrayForKey:STADocumentationURLsKey];
+                                                       documentationURLs = documentationURLs ? : @[];
+                                                       NSString *urlString = [selectedRoot absoluteString];
+                                                       documentationURLs = [documentationURLs containsObject:urlString] ? documentationURLs : [documentationURLs arrayByAddingObject:urlString];
+                                                       [[NSUserDefaults standardUserDefaults] setObject:documentationURLs forKey:STADocumentationURLsKey];
                                                        [[NSUserDefaults standardUserDefaults] synchronize];
                                                    }
                                                    
