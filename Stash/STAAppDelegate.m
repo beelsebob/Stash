@@ -22,7 +22,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 @property (assign,getter=isWaitingForDocsetInput) BOOL waitingForDocsetInput;
 @property (copy) NSString *currentSearchString;
 @property (strong) NSMutableArray *results;
-@property (strong) NSArray *sortedResults;
+@property (strong) NSMutableArray *sortedResults;
 @property (assign, getter=isFindUIShowing) BOOL findUIShowing;
 @property (weak) NSSearchField *selectedSearchField;
 
@@ -522,7 +522,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     [self hideSearchBar:self];
     [self setCurrentSearchString:searchString];
     [self setResults:[NSMutableArray array]];
-    [self setSortedResults:[NSArray array]];
+    [self setSortedResults:[NSMutableArray array]];
     [[self resultsTable] reloadData];
     for (STADocSet *docSet in [[self preferencesController] enabledDocsets])
     {
@@ -539,7 +539,14 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                                                       if ([searchString isEqualToString:[self currentSearchString]])
                                                       {
                                                           [[self results] addObject:symbol];
-                                                          [self setSortedResults:[[self results] sortedArrayUsingSelector:@selector(compare:)]];
+                                                          [[self sortedResults] insertObject:symbol
+                                                                                     atIndex:[[self sortedResults] indexOfObject:symbol
+                                                                                                                   inSortedRange:NSMakeRange(0, [[self sortedResults] count])
+                                                                                                                         options:NSBinarySearchingInsertionIndex
+                                                                                                                 usingComparator:^ NSComparisonResult (id a, id b)
+                                                                                              {
+                                                                                                  return [a compare:b];
+                                                                                              }]];
                                                           [[self resultsTable] insertRowsAtIndexes:[NSIndexSet indexSetWithIndex:[[self sortedResults] indexOfObject:symbol]] withAnimation:0];
                                                           if ([[self resultsTable] selectedRow] != 0)
                                                           {
