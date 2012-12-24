@@ -90,6 +90,11 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     [[self openStashMenuItem] setKeyEquivalent:[NSString stringWithCharacters:&c length:1]];
     [[self openStashMenuItem] setKeyEquivalentModifierMask:[[self preferencesController] keyboardShortcutModifierFlags]];
     
+    [[[self resultWebView] preferences] setJavaEnabled:NO];
+    [[[self resultWebView] preferences] setJavaScriptEnabled:NO];
+    [[[self resultWebView] preferences] setJavaScriptCanOpenWindowsAutomatically:NO];
+    [[[self resultWebView] preferences] setPlugInsEnabled:NO];
+    
     void(^handler)(NSEvent *) = ^(NSEvent *e)
     {
         if (![[self preferencesController] isMonitoringForEvents] && ![self isWaitingForDocsetInput])
@@ -160,7 +165,15 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                                                [[self searchField] setEnabled:YES];
                                                [[self searchField] selectText:self];
                                                [[self indexingDocsetsContainer] setHidden:YES];
-                                               [[self titleView] setStringValue:@""];
+                                               if ([[self docsets] count] > 0)
+                                               {
+                                                   [[self titleView] setStringValue:@""];
+                                               }
+                                               else
+                                               {
+                                                   [[self titleView] setStringValue:@"Stash Could Not Find Any Documentation"];
+                                                   [[self docsetsNotFoundView] setHidden:NO];
+                                               }
                                            });
                         }];
                    });
@@ -215,6 +228,32 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                           direction:YES
                       caseSensitive:NO
                                wrap:YES];
+}
+
+#define STADocumentationBookmarksKey @"DocsBookmarks"
+
+- (IBAction)addDocumentation:(id)sender
+{
+    [[self docsetsNotFoundView] setHidden:YES];
+    NSString *lastRoot = [[self docsetRoots] objectAtIndex:0];
+    NSString *lastPath = [[[[lastRoot stringByAppendingPathComponent:@"Developer"] stringByAppendingPathComponent:@"Shared"] stringByAppendingPathComponent:@"Documentation"] stringByAppendingPathComponent:@"DocSets"];
+    [self requestAccessToDirectory:lastPath
+                      continuation:^(NSURL *selectedRoot)
+     {
+         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^()
+                        {
+                            NSError *err = nil;
+                            NSData *bookmark = [selectedRoot bookmarkDataWithOptions:NSURLBookmarkCreationWithSecurityScope | NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess
+                                                      includingResourceValuesForKeys:@[]
+                                                                       relativeToURL:nil
+                                                                               error:&err];
+                            NSArray *documentationBookmarks = [[NSUserDefaults standardUserDefaults] arrayForKey:STADocumentationBookmarksKey];
+                            documentationBookmarks = documentationBookmarks ? : @[];
+                            documentationBookmarks = [documentationBookmarks containsObject:bookmark] ? documentationBookmarks : [documentationBookmarks arrayByAddingObject:bookmark];
+                            [[NSUserDefaults standardUserDefaults] setObject:documentationBookmarks forKey:STADocumentationBookmarksKey];
+                            [[NSUserDefaults standardUserDefaults] synchronize];
+                        });
+     }];
 }
 
 - (void)searchAgain:(BOOL)backwards
@@ -288,8 +327,6 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     }
     [self setDocsets:docsets];
 }
-
-#define STADocumentationBookmarksKey @"DocsBookmarks"
 
 - (void)refreshExistingBookmarksWithContinuation:(void(^)(void))cont
 {

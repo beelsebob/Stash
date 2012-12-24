@@ -26,6 +26,7 @@
 @property (weak) IBOutlet NSSearchField *inPageSearchField;
 @property (weak) IBOutlet NSTableView *indexingDocsetsView;
 @property (weak) IBOutlet NSScrollView *indexingDocsetsContainer;
+@property (weak) IBOutlet NSView *docsetsNotFoundView;
 
 - (IBAction)toggleStashWindow:(id)sender;
 - (IBAction)search:(id)sender;
@@ -35,5 +36,6 @@
 - (IBAction)hideSearchBar:(id)sender;
 - (IBAction)showFindUI;
 - (IBAction)searchWithinPage:(id)sender;
+- (IBAction)addDocumentation:(id)sender;
 
 @end
