@@ -247,11 +247,15 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                                                       includingResourceValuesForKeys:@[]
                                                                        relativeToURL:nil
                                                                                error:&err];
-                            NSArray *documentationBookmarks = [[NSUserDefaults standardUserDefaults] arrayForKey:STADocumentationBookmarksKey];
-                            documentationBookmarks = documentationBookmarks ? : @[];
-                            documentationBookmarks = [documentationBookmarks containsObject:bookmark] ? documentationBookmarks : [documentationBookmarks arrayByAddingObject:bookmark];
-                            [[NSUserDefaults standardUserDefaults] setObject:documentationBookmarks forKey:STADocumentationBookmarksKey];
-                            [[NSUserDefaults standardUserDefaults] synchronize];
+                            if (nil != bookmark)
+                            {
+                                NSArray *documentationBookmarks = [[NSUserDefaults standardUserDefaults] arrayForKey:STADocumentationBookmarksKey];
+                                documentationBookmarks = documentationBookmarks ? : @[];
+                                documentationBookmarks = [documentationBookmarks containsObject:bookmark] ? documentationBookmarks : [documentationBookmarks arrayByAddingObject:bookmark];
+                                [[NSUserDefaults standardUserDefaults] setObject:documentationBookmarks forKey:STADocumentationBookmarksKey];
+                                [[NSUserDefaults standardUserDefaults] synchronize];
+                            }
+                            [self indexDocsetsWithPermissionInRoots:@[lastRoot] withContinuation:^(){}];
                         });
      }];
 }
@@ -370,11 +374,14 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                                                                              includingResourceValuesForKeys:@[]
                                                                                               relativeToURL:nil
                                                                                                       error:&err];
-                                                   NSArray *documentationBookmarks = [[NSUserDefaults standardUserDefaults] arrayForKey:STADocumentationBookmarksKey];
-                                                   documentationBookmarks = documentationBookmarks ? : @[];
-                                                   documentationBookmarks = [documentationBookmarks containsObject:bookmark] ? documentationBookmarks : [documentationBookmarks arrayByAddingObject:bookmark];
-                                                   [[NSUserDefaults standardUserDefaults] setObject:documentationBookmarks forKey:STADocumentationBookmarksKey];
-                                                   [[NSUserDefaults standardUserDefaults] synchronize];
+                                                   if (nil != bookmark)
+                                                   {
+                                                       NSArray *documentationBookmarks = [[NSUserDefaults standardUserDefaults] arrayForKey:STADocumentationBookmarksKey];
+                                                       documentationBookmarks = documentationBookmarks ? : @[];
+                                                       documentationBookmarks = [documentationBookmarks containsObject:bookmark] ? documentationBookmarks : [documentationBookmarks arrayByAddingObject:bookmark];
+                                                       [[NSUserDefaults standardUserDefaults] setObject:documentationBookmarks forKey:STADocumentationBookmarksKey];
+                                                       [[NSUserDefaults standardUserDefaults] synchronize];
+                                                   }
                                                    
                                                    [self indexDocsetsInRoots:originalRoots index:idx+1 selectedRoots:[selectedRoots arrayByAddingObject:selectedRoot] withContinuation:cont];
                                                });
