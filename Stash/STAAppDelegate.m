@@ -294,6 +294,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 - (void)refreshExistingBookmarksWithContinuation:(void(^)(void))cont
 {
     NSArray *documentationBookmarks = [[NSUserDefaults standardUserDefaults] arrayForKey:STADocumentationBookmarksKey];
+    NSMutableArray *bookmarkURLs = [NSMutableArray arrayWithCapacity:[documentationBookmarks count]];
     for (NSData *bookmark in documentationBookmarks)
     {
         BOOL stale = NO;
@@ -304,8 +305,9 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                                    bookmarkDataIsStale:&stale
                                                  error:&err];
         [url startAccessingSecurityScopedResource];
+        [bookmarkURLs addObject:url];
     }
-    cont();
+    [self indexDocsetsWithPermissionInRoots:bookmarkURLs withContinuation:cont];
 }
 
 - (void)indexDocsetsInRoots:(NSArray *)roots withContinuation:(void(^)(void))cont
@@ -372,38 +374,44 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
             {
                 NSString *docsetCachePath = [[[self pathForArchive] stringByAppendingPathComponent:[docsetURL lastPathComponent]] stringByAppendingPathExtension:@"stashidx"];
                 
-                STADocSet *docset = [STADocSet docSetWithURL:docsetURL
-                                                   cachePath:docsetCachePath
-                                                 onceIndexed:^(STADocSet *idx)
-                                     {
-                                         [NSKeyedArchiver archiveRootObject:idx toFile:docsetCachePath];
-                                         dispatch_sync(_docsetArrayEditingQueue, ^()
-                                                       {
-                                                           [_indexingDocsets removeObjectIdenticalTo:idx];
-                                                           [_docsets addObject:idx];
-                                                           dispatch_async(dispatch_get_main_queue(), ^()
-                                                                          {
-                                                                              [[self indexingDocsetsView] reloadData];
-                                                                          });
-                                                           if (finishedSearchingForDocsets && [_indexingDocsets count] == 0)
-                                                           {
-                                                               dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), cont);
-                                                           }
-                                                       });
-                                     }];
-                dispatch_sync(_docsetArrayEditingQueue, ^()
-                              {
-                                  if ([_docsets indexOfObjectIdenticalTo:docset] == NSNotFound)
-                                  {
-                                      [_indexingDocsets addObject:docset];
-                                  }
-                              });
-                if (nil != docset)
+                NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfFileSystemForPath:docsetCachePath error:&err];
+                NSDictionary *docsetAttrs = [docsetURL resourceValuesForKeys:@[NSURLContentModificationDateKey] error:&err];
+                if (nil == attrs ||
+                    [(NSDate *)docsetAttrs[NSURLContentModificationDateKey] compare:attrs[NSFileModificationDate]] == NSOrderedDescending)
                 {
-                    [[self preferencesController] registerDocset:docset];
-                    if (![[[self preferencesController] enabledDocsets] containsObject:docset])
+                    STADocSet *docset = [STADocSet docSetWithURL:docsetURL
+                                                       cachePath:docsetCachePath
+                                                     onceIndexed:^(STADocSet *idx)
+                                         {
+                                             [NSKeyedArchiver archiveRootObject:idx toFile:docsetCachePath];
+                                             dispatch_sync(_docsetArrayEditingQueue, ^()
+                                                           {
+                                                               [_indexingDocsets removeObjectIdenticalTo:idx];
+                                                               [_docsets addObject:idx];
+                                                               dispatch_async(dispatch_get_main_queue(), ^()
+                                                                              {
+                                                                                  [[self indexingDocsetsView] reloadData];
+                                                                              });
+                                                               if (finishedSearchingForDocsets && [_indexingDocsets count] == 0)
+                                                               {
+                                                                   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), cont);
+                                                               }
+                                                           });
+                                         }];
+                    dispatch_sync(_docsetArrayEditingQueue, ^()
+                                  {
+                                      if ([_docsets indexOfObjectIdenticalTo:docset] == NSNotFound)
+                                      {
+                                          [_indexingDocsets addObject:docset];
+                                      }
+                                  });
+                    if (nil != docset)
                     {
-                        [docset unload];
+                        [[self preferencesController] registerDocset:docset];
+                        if (![[[self preferencesController] enabledDocsets] containsObject:docset])
+                        {
+                            [docset unload];
+                        }
                     }
                 }
             }
