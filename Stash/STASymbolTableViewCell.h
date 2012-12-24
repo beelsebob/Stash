@@ -8,9 +8,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface STASymbolTableViewCell : NSTextFieldCell
+@interface STASymbolTableViewCell : NSView
 
-@property (strong) NSImage *symbolTypeImage;
-@property (strong) NSImage *platformImage;
+@property (strong,nonatomic) NSImage *symbolTypeImage;
+@property (strong,nonatomic) NSImage *platformImage;
+@property (copy  ,nonatomic) NSString *symbolName;
 
 @end

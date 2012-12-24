@@ -17,6 +17,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 @interface STAAppDelegate () <NSWindowDelegate>
 
+@property (copy) NSArray *indexingDocsets;
 @property (copy) NSArray *docsets;
 @property (copy) NSString *currentSearchString;
 @property (strong) NSMutableArray *results;
@@ -32,25 +33,23 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 @implementation STAAppDelegate
 {
+    NSMutableArray *_indexingDocsets;
     NSMutableArray *_docsets;
+    dispatch_queue_t _docsetArrayEditingQueue;
 }
 
-@synthesize window = _window;
-@synthesize statusMenu = _statusMenu;
-@synthesize openStashMenuItem = _openStashMenuItem;
-@synthesize statusItem = _statusItem;
-@synthesize resultsTable = _resultsTable;
-@synthesize resultWebView = _resultWebView;
-@synthesize titleView = _titleView;
-@synthesize searchField = _searchField;
-@synthesize preferencesController = _preferencesController;
+- (NSArray *)indexingDocsets
+{
+    return [_indexingDocsets copy];
+}
 
-@synthesize docsets = _docsets;
-@synthesize currentSearchString = _currentSearchString;
-@synthesize results = _results;
-@synthesize sortedResults = _sortedResults;
-
-@synthesize findUIShowing = _findUIShowing;
+- (void)setIndexingDocsets:(NSArray *)indexingDocsets
+{
+    if (indexingDocsets != _indexingDocsets)
+    {
+        _indexingDocsets = [indexingDocsets mutableCopy];
+    }
+}
 
 - (NSArray *)docsets
 {
@@ -67,9 +66,11 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    _docsetArrayEditingQueue = dispatch_queue_create("org.beelsebob.Stash.docsetArrayEditing", DISPATCH_QUEUE_SERIAL);
+    
     [self setPreferencesController:[[STAPreferencesController alloc] initWithNibNamed:@"STAPreferencesController" bundle:nil]];
     [[self preferencesController] setDelegate:self];
-
+    
     STAIconShowingMode mode = [[self preferencesController] iconMode];
     
     if (mode == STAIconShowingModeBoth || mode == STAIconShowingModeMenuBar)
@@ -157,10 +158,16 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                                            {
                                                [[self searchField] setEnabled:YES];
                                                [[self searchField] selectText:self];
+                                               [[self indexingDocsetsContainer] setHidden:YES];
                                                [[self titleView] setStringValue:@""];
                                            });
                         }];
                    });
+}
+
+- (void)dealloc
+{
+    dispatch_release(_docsetArrayEditingQueue);
 }
 
 - (void)showFindUI
@@ -220,11 +227,14 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 - (void)readDocsetsWithContinuation:(void(^)(void))cont
 {
     [self setDocsets:@[]];
+    [self setIndexingDocsets:@[]];
     
     [self readExistingIndexes];
     dispatch_async(dispatch_get_main_queue(), ^()
                    {
                        [[self titleView] setStringValue:@"Stash is Indexing, Please Wait..."];
+                       [[self indexingDocsetsContainer] setHidden:NO];
+                       [[self indexingDocsetsView] reloadData];
                    });
     [self refreshExistingBookmarksWithContinuation:^()
      {
@@ -341,8 +351,6 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 {
     NSError *err;
     BOOL isDir;
-    __block NSUInteger numDocsetsIndexing = 0;
-    __block NSUInteger numDocsetsIndexed = 0;
     __block BOOL finishedSearchingForDocsets = NO;
     for (NSURL *root in roots)
     {
@@ -355,35 +363,56 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
             if (docsetExists && isDir)
             {
                 NSString *docsetCachePath = [[[self pathForArchive] stringByAppendingPathComponent:[docsetURL lastPathComponent]] stringByAppendingPathExtension:@"stashidx"];
-                numDocsetsIndexing++;
-                STADocSet *indexedDocset = [STADocSet docSetWithURL:docsetURL
-                                                          cachePath:docsetCachePath
-                                                        onceIndexed:^(STADocSet *idx)
-                                            {
-                                                [NSKeyedArchiver archiveRootObject:idx toFile:docsetCachePath];
-                                                numDocsetsIndexed++;
-                                                if (numDocsetsIndexed == numDocsetsIndexing && finishedSearchingForDocsets)
-                                                {
-                                                    cont();
-                                                }
-                                            }];
-                if (nil != indexedDocset)
+                
+                STADocSet *docset = [STADocSet docSetWithURL:docsetURL
+                                                   cachePath:docsetCachePath
+                                                 onceIndexed:^(STADocSet *idx)
+                                     {
+                                         [NSKeyedArchiver archiveRootObject:idx toFile:docsetCachePath];
+                                         dispatch_sync(_docsetArrayEditingQueue, ^()
+                                                       {
+                                                           [_indexingDocsets removeObjectIdenticalTo:idx];
+                                                           [_docsets addObject:idx];
+                                                           dispatch_async(dispatch_get_main_queue(), ^()
+                                                                          {
+                                                                              [[self indexingDocsetsView] reloadData];
+                                                                          });
+                                                           if (finishedSearchingForDocsets && [_indexingDocsets count] == 0)
+                                                           {
+                                                               dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), cont);
+                                                           }
+                                                       });
+                                     }];
+                dispatch_sync(_docsetArrayEditingQueue, ^()
+                              {
+                                  if ([_docsets indexOfObjectIdenticalTo:docset] == NSNotFound)
+                                  {
+                                      [_indexingDocsets addObject:docset];
+                                  }
+                              });
+                if (nil != docset)
                 {
-                    [[self preferencesController] registerDocset:indexedDocset];
-                    [_docsets addObject:indexedDocset];
-                    if (![[[self preferencesController] enabledDocsets] containsObject:indexedDocset])
+                    [[self preferencesController] registerDocset:docset];
+                    if (![[[self preferencesController] enabledDocsets] containsObject:docset])
                     {
-                        [indexedDocset unload];
+                        [docset unload];
                     }
                 }
             }
         }
     }
+    dispatch_async(dispatch_get_main_queue(), ^()
+                   {
+                       [[self indexingDocsetsView] reloadData];
+                   });
     finishedSearchingForDocsets = YES;
-    if (numDocsetsIndexed == numDocsetsIndexing)
-    {
-        cont();
-    }
+    dispatch_sync(_docsetArrayEditingQueue, ^()
+                  {
+                      if (finishedSearchingForDocsets && [_indexingDocsets count] == 0)
+                      {
+                          dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), cont);
+                      }
+                  });
 }
 
 - (NSString *)pathForArchive
@@ -525,12 +554,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 #pragma mark - Table View Data Source
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-    return [[self sortedResults] count];
-}
-
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
-{
-    return row < [[self sortedResults] count] ? [[[self sortedResults] objectAtIndex:row] symbolName] : @"";
+    return tableView == [self indexingDocsetsView] ? [[self docsets] count] + [[self indexingDocsets] count] : [[self sortedResults] count];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
@@ -544,15 +568,55 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     }
 }
 
-- (NSCell *)tableView:(NSTableView *)tableView dataCellForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    return [[STASymbolTableViewCell alloc] init];
+    if (tableView == [self resultsTable])
+    {
+        STASymbolTableViewCell *view = [[STASymbolTableViewCell alloc] initWithFrame:NSZeroRect];
+        [view setSymbolName:row < [[self sortedResults] count] ? [[[self sortedResults] objectAtIndex:row] symbolName] : @""];
+        [view setSymbolTypeImage:NSImageFromSTASymbolType([[[self sortedResults] objectAtIndex:row] symbolType])];
+        [view setPlatformImage:NSImageFromSTAPlatform([[[[self sortedResults] objectAtIndex:row] docSet] platform])];
+        return view;
+    }
+    else
+    {
+        NSArray *allDocsets = [[[self docsets] arrayByAddingObjectsFromArray:[self indexingDocsets]] sortedArrayUsingComparator:^ NSComparisonResult (STADocSet *d1, STADocSet *d2)
+                               {
+                                   return [[d1 name] compare:[d2 name]];
+                               }];
+        if ([[tableColumn identifier] isEqualToString:@"docset"])
+        {
+            NSTextField *textField = [[NSTextField alloc] initWithFrame:NSZeroRect];
+            [textField setEditable:NO];
+            [textField setSelectable:NO];
+            [textField setBordered:NO];
+            [textField setDrawsBackground:NO];
+            [textField setBezeled:NO];
+            [[textField cell] setLineBreakMode:NSLineBreakByTruncatingTail];
+            [textField setStringValue:[[allDocsets objectAtIndex:row] name] ? : @""];
+            return textField;
+        }
+        else if ([[tableColumn identifier] isEqualToString:@"progress"] && [[self indexingDocsets] containsObject:[allDocsets objectAtIndex:row]])
+        {
+            NSProgressIndicator *twirler = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(0.0f, 0.0f, 16.0f, 16.0f)];
+            [twirler setStyle:NSProgressIndicatorSpinningStyle];
+            [twirler setControlSize:NSSmallControlSize];
+            [twirler startAnimation:self];
+            return twirler;
+        }
+        else
+        {
+            NSImageView *tick = [[NSImageView alloc] initWithFrame:NSZeroRect];
+            [tick setImage:[NSImage imageNamed:@"Tick"]];
+            return tick;
+        }
+    }
+    return nil;
 }
 
-- (void)tableView:(NSTableView *)tableView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row
 {
-    [cell setSymbolTypeImage:NSImageFromSTASymbolType([[[self sortedResults] objectAtIndex:row] symbolType])];
-    [cell setPlatformImage:NSImageFromSTAPlatform([[[[self sortedResults] objectAtIndex:row] docSet] platform])];
+    return tableView == [self resultsTable];
 }
 
 #pragma mark - Prefs Delegate

@@ -24,6 +24,8 @@
 @property (strong) STAPreferencesController *preferencesController;
 @property (weak) IBOutlet NSMatrix *searchMethodSelector;
 @property (weak) IBOutlet NSSearchField *inPageSearchField;
+@property (weak) IBOutlet NSTableView *indexingDocsetsView;
+@property (weak) IBOutlet NSScrollView *indexingDocsetsContainer;
 
 - (IBAction)toggleStashWindow:(id)sender;
 - (IBAction)search:(id)sender;

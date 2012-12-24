@@ -20,30 +20,23 @@
 #define kTextOriginYOffset	2
 #define kTextHeightAdjust	4
 
+@interface STASymbolTableViewCell ()
+
+@property (readwrite,strong,nonatomic) NSImageView *platformView;
+@property (readwrite,strong,nonatomic) NSImageView *symbolTypeView;
+@property (readwrite,strong,nonatomic) NSTextField *textField;
+
+@end
+
 @implementation STASymbolTableViewCell
 
-@synthesize symbolTypeImage = _symbolTypeImage;
-@synthesize platformImage = _platformImage;
-
-- (id)initTextCell:(NSString *)aString
+- (id)initWithFrame:(NSRect)frameRect
 {
-    self = [super initTextCell:aString];
+    self = [super initWithFrame:frameRect];
     
     if (self != nil)
     {
-        [self setFont:[NSFont fontWithName:@"Monaco" size:kFontSize]];
-    }
-    
-    return self;
-}
-
-- (id)initImageCell:(NSImage *)image
-{
-    self = [super initImageCell:image];
-    
-    if (self != nil)
-    {
-        [self setFont:[NSFont fontWithName:@"Monaco" size:kFontSize]];
+        [self commonInit];
     }
     
     return self;
@@ -55,112 +48,71 @@
     
     if (self != nil)
     {
-        [self setFont:[NSFont fontWithName:@"Monaco" size:kFontSize]];
+        [self commonInit];
     }
     
     return self;
 }
 
-- (NSRect)titleRectForBounds:(NSRect)cellRect
-{	
-	NSSize imageSize;
-	NSRect platformFrame;
-    NSRect symbolTypeFrame;
-    
-    if (nil != [self platformImage])
+- (void)commonInit
+{
+    NSRect platformRect = NSMakeRect(3.0f, 0.0f, 16.0f, [self bounds].size.height);
+    NSRect symbolTypeRect = NSMakeRect(22.0f, 0.0f, 16.0f, [self bounds].size.height);
+    NSRect textRect = NSMakeRect(41.0f, 0.0f, [self bounds].size.width - 41.0f, [self bounds].size.height - 3.0f);
+    [self setPlatformView:[[NSImageView alloc] initWithFrame:platformRect]];
+    [[self platformView] setImage:[self platformImage]];
+    [self addSubview:[self platformView]];
+    [self setSymbolTypeView:[[NSImageView alloc] initWithFrame:symbolTypeRect]];
+    [[self symbolTypeView] setImage:[self symbolTypeImage]];
+    [self addSubview:[self symbolTypeView]];
+    [self setTextField:[[NSTextField alloc] initWithFrame:textRect]];
+    [[self textField] setFont:[NSFont fontWithName:@"Monaco" size:kFontSize]];
+    [[self textField] setEditable:NO];
+    [[self textField] setSelectable:NO];
+    [[self textField] setBordered:NO];
+    [[self textField] setDrawsBackground:NO];
+    [[self textField] setBezeled:NO];
+    [[[self textField] cell] setLineBreakMode:NSLineBreakByTruncatingTail];
+    [[self textField] setStringValue:[self symbolName] ? : @""];
+    [self addSubview:[self textField]];
+}
+
+- (void)setFrame:(NSRect)aRect
+{
+    [super setFrame:aRect];
+    NSRect platformRect = NSMakeRect(3.0f, 0.0f, 16.0f, [self bounds].size.height);
+    NSRect symbolTypeRect = NSMakeRect(22.0f, 0.0f, 16.0f, [self bounds].size.height);
+    NSRect textRect = NSMakeRect(41.0f, 0.0f, [self bounds].size.width - 41.0f, [self bounds].size.height - 3.0f);
+    [[self platformView] setFrame:platformRect];
+    [[self symbolTypeView] setFrame:symbolTypeRect];
+    [[self textField] setFrame:textRect];
+}
+
+- (void)setPlatformImage:(NSImage *)platformImage
+{
+    if (platformImage != _platformImage)
     {
-        imageSize = [[self platformImage] size];
-        NSDivideRect(cellRect, &platformFrame, &cellRect, 3 + imageSize.width, NSMinXEdge);
-        platformFrame.origin.x += kImageOriginXOffset;
-        platformFrame.origin.y -= kImageOriginYOffset;
-        platformFrame.size = imageSize;
-        platformFrame.origin.y += ceil((cellRect.size.height - platformFrame.size.height) / 2);
+        _platformImage = platformImage;
+        [[self platformView] setImage:platformImage];
     }
-    if (nil != [self symbolTypeImage])
+}
+
+- (void)setSymbolTypeImage:(NSImage *)symbolTypeImage
+{
+    if (symbolTypeImage != _symbolTypeImage)
     {
-        imageSize = [[self symbolTypeImage] size];
-        NSDivideRect(cellRect, &symbolTypeFrame, &cellRect, 3 + imageSize.width, NSMinXEdge);
-        symbolTypeFrame.origin.x += kImageOriginXOffset;
-        symbolTypeFrame.origin.y -= kImageOriginYOffset;
-        symbolTypeFrame.size = imageSize;
-        symbolTypeFrame.origin.y += ceil((cellRect.size.height - symbolTypeFrame.size.height) / 2);
+        _symbolTypeImage = symbolTypeImage;
+        [[self symbolTypeView] setImage:symbolTypeImage];
     }
-	
-	NSRect newFrame = cellRect;
-	newFrame.origin.x += kTextOriginXOffset;
-	newFrame.origin.y += kTextOriginYOffset;
-	newFrame.size.height -= kTextHeightAdjust;
-    
-	return newFrame;
 }
 
-- (void)editWithFrame:(NSRect)aRect inView:(NSView*)controlView editor:(NSText*)textObj delegate:(id)anObject event:(NSEvent*)theEvent
+- (void)setSymbolName:(NSString *)symbolName
 {
-	NSRect textFrame = [self titleRectForBounds:aRect];
-	[super editWithFrame:textFrame inView:controlView editor:textObj delegate:anObject event:theEvent];
-}
-
-- (void)selectWithFrame:(NSRect)aRect inView:(NSView *)controlView editor:(NSText *)textObj delegate:(id)anObject start:(NSInteger)selStart length:(NSInteger)selLength
-{
-	NSRect textFrame = [self titleRectForBounds:aRect];
-	[super selectWithFrame:textFrame inView:controlView editor:textObj delegate:anObject start:selStart length:selLength];
-}
-
-- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
-{
-	if ([self platformImage] != nil)
-	{
-        NSSize imageSize;
-        NSRect platformFrame;
-        
-        imageSize = [[self platformImage] size];
-        NSDivideRect(cellFrame, &platformFrame, &cellFrame, kImageOriginXOffset + imageSize.width, NSMinXEdge);
-        platformFrame.origin.x += kImageOriginXOffset;
-        platformFrame.origin.y += kImageOriginYOffset;
-        platformFrame.size = imageSize;
-		
-        [[self platformImage] drawInRect:platformFrame
-                                fromRect:NSMakeRect(0.0f, 0.0f, imageSize.width, imageSize.height)
-                               operation:NSCompositeSourceOver
-                                fraction:1.0f
-                          respectFlipped:YES
-                                   hints:nil];
-    }
-    if ([self symbolTypeImage] != nil)
+    if (symbolName != _symbolName)
     {
-        NSSize imageSize;
-        NSRect symbolTypeFrame;
-        imageSize = [[self symbolTypeImage] size];
-        NSDivideRect(cellFrame, &symbolTypeFrame, &cellFrame, kImageOriginXOffset + imageSize.width, NSMinXEdge);
-        symbolTypeFrame.origin.x += kImageOriginXOffset;
-        symbolTypeFrame.origin.y += kSymbolTypeImageOriginYOffset;
-        symbolTypeFrame.size = imageSize;
-		
-        [[self symbolTypeImage] drawInRect:symbolTypeFrame
-                                  fromRect:NSMakeRect(0.0f, 0.0f, imageSize.width, imageSize.height)
-                                 operation:NSCompositeSourceOver
-                                  fraction:1.0f
-                            respectFlipped:YES
-                                     hints:nil];
+        _symbolName = [symbolName copy];
+        [[self textField] setStringValue:_symbolName ? : @""];
     }
-    
-    NSRect newFrame = cellFrame;
-    newFrame.origin.x += kTextOriginXOffset;
-    newFrame.origin.y += kTextOriginYOffset;
-    newFrame.size.height -= kTextHeightAdjust;
-    [super drawWithFrame:newFrame inView:controlView];
-}
-
-- (NSSize)cellSize
-{
-    NSSize cellSize = [super cellSize];
-    cellSize.width += ([self platformImage] ? [[self platformImage] size].width : 0) + 3 + ([self symbolTypeImage] ? [[self symbolTypeImage] size].width : 0) + 3;
-    return cellSize;
-}
-
-- (NSUInteger)hitTestForEvent:(NSEvent *)event inRect:(NSRect)cellFrame ofView:(NSView *)controlView
-{
-	return NSCellHitContentArea;
 }
 
 @end
