@@ -540,12 +540,11 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                                                       {
                                                           [[self results] addObject:symbol];
                                                           [self setSortedResults:[[self results] sortedArrayUsingSelector:@selector(compare:)]];
-                                                          [[self resultsTable] reloadData];
-                                                          if ([[self resultsTable] selectedRow] == -1)
+                                                          [[self resultsTable] insertRowsAtIndexes:[NSIndexSet indexSetWithIndex:[[self sortedResults] indexOfObject:symbol]] withAnimation:0];
+                                                          if ([[self resultsTable] selectedRow] != 0)
                                                           {
                                                               [[self resultsTable] selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
                                                           }
-                                                          [self tableViewSelectionDidChange:nil];
                                                       }
                                                   });
                                 }];
