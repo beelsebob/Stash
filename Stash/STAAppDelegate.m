@@ -344,8 +344,8 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 - (void)refreshExistingBookmarksWithContinuation:(void(^)(void))cont
 {
-    NSDictionary* environ = [[NSProcessInfo processInfo] environment];
-    BOOL inSandbox = (nil != [environ objectForKey:@"APP_SANDBOX_CONTAINER_ID"]);
+    NSDictionary *environment = [[NSProcessInfo processInfo] environment];
+    BOOL inSandbox = (nil != [environment objectForKey:@"APP_SANDBOX_CONTAINER_ID"]);
     NSMutableArray *urls = [NSMutableArray array];
     if (inSandbox)
     {
