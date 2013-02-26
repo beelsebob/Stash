@@ -101,8 +101,10 @@
                     return [NSString stringWithFormat:@"typedef %@", _symbolName];
                 case STASymbolTypeEnumerationConstant:
                     return [NSString stringWithFormat:@"enum { %@ }", _symbolName];
+                case STASymbolTypeData:
+                    return [_symbolName copy];
                 default:
-                    return [NSString stringWithFormat:@"C: %d", _symbolType];
+                    return [NSString stringWithFormat:@"C: %d (%@)", _symbolType, _symbolName];
             }
             break;
         }
@@ -118,10 +120,18 @@
                     return [NSString stringWithFormat:@"-%@", _symbolName];
                 case STASymbolTypeInstanceProperty:
                     return [NSString stringWithFormat:@"@property %@", _symbolName];
+                case STASymbolTypeInterfaceClassMethod:
+                    return [NSString stringWithFormat:@"+%@", _symbolName];
+                case STASymbolTypeInterfaceMethod:
+                    return [NSString stringWithFormat:@"-%@", _symbolName];
+                case STASymbolTypeInterfaceProperty:
+                    return [NSString stringWithFormat:@"@property %@", _symbolName];
                 case STASymbolTypeCategory:
-                    return [NSString stringWithFormat:@"@interface %@", _symbolName];
+                    return [NSString stringWithFormat:@"@interface ?(%@)", _symbolName];
+                case STASymbolTypeInterface:
+                    return [NSString stringWithFormat:@"@protocol %@", _symbolName];
                 default:
-                    return [NSString stringWithFormat:@"Obj-C: %d", _symbolType];
+                    return [NSString stringWithFormat:@"Obj-C: %d (%@)", _symbolType, _symbolName];
             }
         }
         default:
@@ -156,95 +166,49 @@
 
 STALanguage STALanguageFromNSString(NSString *languageString)
 {
-    if ([languageString isEqualToString:@"c"])
+    static NSDictionary *languageStrings = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^
     {
-        return STALanguageC;
-    }
-    else if ([languageString isEqualToString:@"occ"])
-    {
-        return STALanguageObjectiveC;
-    }
-    else if ([languageString isEqualToString:@"cpp"])
-    {
-        return STALanguageCPlusPlus;
-    }
-    else if ([languageString isEqualToString:@"javascript"])
-    {
-        return STALanguageJavascript;
-    }
-    return STALanguageUnknown;
+        languageStrings = (@{
+                           @"c"          : @(STALanguageC),
+                           @"occ"        : @(STALanguageObjectiveC),
+                           @"cpp"        : @(STALanguageCPlusPlus),
+                           @"javascript" : @(STALanguageJavascript)
+                           });
+    });
+    
+    NSNumber *language = languageStrings[languageString];
+    return language == nil ? STALanguageUnknown : [language intValue];
 }
 
 STASymbolType STASymbolTypeFromNSString(NSString *symbolTypeString)
 {
-    if ([symbolTypeString isEqualToString:@"func"])
+    static NSDictionary *symbolTypeStrings = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^
     {
-        return STASymbolTypeFunction;
-    }
-    else if ([symbolTypeString isEqualToString:@"macro"])
-    {
-        return STASymbolTypeMacro;
-    }
-    else if ([symbolTypeString isEqualToString:@"instm"])
-    {
-        return STASymbolTypeInstanceMethod;
-    }
-    else if ([symbolTypeString isEqualToString:@"econst"])
-    {
-        return STASymbolTypeEnumerationConstant;
-    }
-    else if ([symbolTypeString isEqualToString:@"data"])
-    {
-        return STASymbolTypeData;
-    }
-    else if ([symbolTypeString isEqualToString:@"instp"])
-    {
-        return STASymbolTypeInstanceProperty;
-    }
-    else if ([symbolTypeString isEqualToString:@"intfp"])
-    {
-        return STASymbolTypeInterfaceProperty;
-    }
-    else if ([symbolTypeString isEqualToString:@"intfm"])
-    {
-        return STASymbolTypeInterfaceMethod;
-    }
-    else if ([symbolTypeString isEqualToString:@"intfcm"])
-    {
-        return STASymbolTypeInterfaceClassMethod;
-    }
-    else if ([symbolTypeString isEqualToString:@"tag"])
-    {
-        return STASymbolTypeTag;
-    }
-    else if ([symbolTypeString isEqualToString:@"clm"])
-    {
-        return STASymbolTypeClassMethod;
-    }
-    else if ([symbolTypeString isEqualToString:@"tdef"])
-    {
-        return STASymbolTypeTypeDefinition;
-    }
-    else if ([symbolTypeString isEqualToString:@"cl"])
-    {
-        return STASymbolTypeClass;
-    }
-    else if ([symbolTypeString isEqualToString:@"intf"])
-    {
-        return STASymbolTypeInterface;
-    }
-    else if ([symbolTypeString isEqualToString:@"cat"])
-    {
-        return STASymbolTypeCategory;
-    }
-    else if ([symbolTypeString isEqualToString:@"binding"])
-    {
-        return STASymbolTypeBinding;
-    }
-    else if ([symbolTypeString isEqualToString:@"clconst"])
-    {
-        return STASymbolTypeClassConstant;
-    }
+        symbolTypeStrings = (@{
+                             @"func"    : @(STASymbolTypeFunction),
+                             @"macro"   : @(STASymbolTypeMacro),
+                             @"instm"   : @(STASymbolTypeInstanceMethod),
+                             @"econst"  : @(STASymbolTypeEnumerationConstant),
+                             @"data"    : @(STASymbolTypeData),
+                             @"instp"   : @(STASymbolTypeInstanceProperty),
+                             @"intfp"   : @(STASymbolTypeInterfaceProperty),
+                             @"intfm"   : @(STASymbolTypeInterfaceMethod),
+                             @"intfcm"  : @(STASymbolTypeInterfaceClassMethod),
+                             @"tag"     : @(STASymbolTypeTag),
+                             @"clm"     : @(STASymbolTypeClassMethod),
+                             @"tdef"    : @(STASymbolTypeTypeDefinition),
+                             @"cl"      : @(STASymbolTypeClass),
+                             @"intf"    : @(STASymbolTypeInterface),
+                             @"cat"     : @(STASymbolTypeCategory),
+                             @"binding" : @(STASymbolTypeBinding),
+                             @"clconst" : @(STASymbolTypeClassConstant)
+                             });
+    });
     
-    return STASymbolTypeUnknown;
+    NSNumber *symbolType = symbolTypeStrings[symbolTypeString];
+    return symbolType == nil ? STASymbolTypeUnknown : [symbolType intValue];
 }
