@@ -68,16 +68,6 @@ NSString *descriptingStringFromChar(unichar c)
 
 @implementation STAPreferencesController
 
-@synthesize delegate = _delegate;
-@synthesize shortcutButton = _shortcutButton;
-@synthesize shortcutText = _shortcutText;
-@synthesize docsetTable = _docsetTable;
-
-@synthesize window = _window;
-@synthesize internalRegisteredDocsets = _internalRegisteredDocsets;
-
-@synthesize eventMonitor = _eventMonitor;
-
 - (id)initWithNibNamed:(NSString *)nibName bundle:(NSBundle *)bundle
 {
     self = [super init];

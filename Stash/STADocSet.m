@@ -23,13 +23,6 @@
 
 @implementation STADocSet
 
-@synthesize loaded = _loaded;
-@synthesize symbols = _symbols;
-@synthesize name = _name;
-@synthesize version = _version;
-@synthesize platform = _platform;
-@synthesize cachePath = _cachePath;
-
 + (id)docSetWithURL:(NSURL *)url cachePath:(NSString *)cachePath onceIndexed:(void(^)(STADocSet *))completion
 {
     return [[self alloc] initWithURL:url cachePath:cachePath onceIndexed:completion];
@@ -189,13 +182,26 @@
     {
         [self reload];
     }
-    for (STASymbol *s in [self symbols])
-    {
-        if ([s matches:searchString method:method])
-        {
-            result(s);
-        }
-    }
+    
+#ifdef DEBUG
+    NSDate *start = [NSDate date];
+#endif 
+    
+    [[self symbols] enumerateObjectsWithOptions:NSEnumerationConcurrent
+                                     usingBlock:^(STASymbol *s,
+                                                  NSUInteger idx,
+                                                  BOOL *stop)
+     {
+         if ([s matches:searchString method:method])
+         {
+             result(s);
+         }
+     }];
+
+#ifdef DEBUG
+    NSTimeInterval timeInterval = [start timeIntervalSinceNow];
+    DLog(@"Enumeration time (D:%@,Q:%@) %lf", self.name, searchString, timeInterval);
+#endif 
 }
 
 - (void)unload
