@@ -189,13 +189,21 @@
     {
         [self reload];
     }
-    for (STASymbol *s in [self symbols])
-    {
+
+    NSDate *start = [NSDate date];
+    
+    [[self symbols] enumerateObjectsWithOptions:NSEnumerationConcurrent
+                                     usingBlock:^(STASymbol *s,
+                                                  NSUInteger idx,
+                                                  BOOL *stop) {
         if ([s matches:searchString method:method])
         {
             result(s);
         }
-    }
+    }];
+    
+    NSTimeInterval timeInterval = [start timeIntervalSinceNow];
+    DLog(@"Enumeration time (D:%@,Q:%@) %lf", self.name, searchString, timeInterval);
 }
 
 - (void)unload
