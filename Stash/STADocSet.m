@@ -23,13 +23,6 @@
 
 @implementation STADocSet
 
-@synthesize loaded = _loaded;
-@synthesize symbols = _symbols;
-@synthesize name = _name;
-@synthesize version = _version;
-@synthesize platform = _platform;
-@synthesize cachePath = _cachePath;
-
 + (id)docSetWithURL:(NSURL *)url cachePath:(NSString *)cachePath onceIndexed:(void(^)(STADocSet *))completion
 {
     return [[self alloc] initWithURL:url cachePath:cachePath onceIndexed:completion];
