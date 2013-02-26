@@ -313,7 +313,6 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     if (appSupportDirectoryIsPresent && !isDir)
     {
         NSLog(@"Could not create app support directory – a file is in the way");
-        appSupportDirectoryIsPresent = NO;
     }
     else if (!appSupportDirectoryIsPresent)
     {

@@ -137,7 +137,7 @@
                                 success = [scanner scanUpToString:@"/" intoString:&dump];
                                 [scanner setScanLocation:[scanner scanLocation] + 1];
                                 if (!success) { continue; }
-                                success = [scanner scanUpToString:@"/" intoString:&symbol];
+                                [scanner scanUpToString:@"/" intoString:&symbol];
                                 NSString *fullPath = [path stringByAppendingFormat:@"#%@", n];
                                 s = [[STASymbol alloc] initWithLanguageString:nil symbolTypeString:nil symbolName:symbol url:[NSURL URLWithString:fullPath] docSet:self];
                             }
@@ -149,12 +149,12 @@
                                 success = [scanner scanUpToString:@"/" intoString:&symbolType];
                                 [scanner setScanLocation:[scanner scanLocation] + 1];
                                 if (!success) { continue; }
-                                success = [scanner scanUpToString:@"/" intoString:&parent];
+                                [scanner scanUpToString:@"/" intoString:&parent];
                                 NSString *fullPath = [path stringByAppendingFormat:@"#%@", n];
                                 if ([scanner scanLocation] < [n length] - 1)
                                 {
                                     [scanner setScanLocation:[scanner scanLocation] + 1];
-                                    success = [scanner scanUpToString:@"/" intoString:&symbol];
+                                    [scanner scanUpToString:@"/" intoString:&symbol];
                                     s = [[STASymbol alloc] initWithLanguageString:language symbolTypeString:symbolType symbolName:symbol parentName:parent url:[NSURL URLWithString:fullPath] docSet:self];
                                 }
                                 else
