@@ -12,13 +12,6 @@
 
 @implementation STASymbol
 
-@synthesize language = _language;
-@synthesize symbolType = _symbolType;
-@synthesize symbolName = _symbolName;
-//@synthesize parentName = _parentName;
-@synthesize url = _url;
-@synthesize docSet = _docSet;
-
 - (id)initWithLanguageString:(NSString *)language symbolTypeString:(NSString *)symbolType symbolName:(NSString *)symbolName url:(NSURL *)url docSet:(STADocSet *)docSet
 {
     return [self initWithLanguageString:language symbolTypeString:symbolType symbolName:symbolName parentName:nil url:url docSet:docSet];
