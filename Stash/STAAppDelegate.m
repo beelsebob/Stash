@@ -184,6 +184,16 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                    });
 }
 
+- (BOOL)applicationShouldHandleReopen:(NSApplication *)theApplication hasVisibleWindows:(BOOL)hasVisibleWindows
+{
+    if (!hasVisibleWindows)
+    {
+        [self toggleStashWindow:nil];
+    }
+
+    return YES;
+}
+
 - (void)dealloc
 {
     dispatch_release(_docsetArrayEditingQueue);
