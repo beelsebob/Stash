@@ -85,6 +85,11 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     {
         [[NSApplication sharedApplication] setActivationPolicy:NSApplicationActivationPolicyRegular];
     }
+
+    if (![[self preferencesController] appShouldHideWhenNotActive])
+    {
+        [self toggleStashWindow:nil];
+    }
     
     unichar c = [[self preferencesController] keyboardShortcutCharacter];
     [[self openStashMenuItem] setKeyEquivalent:[NSString stringWithCharacters:&c length:1]];
