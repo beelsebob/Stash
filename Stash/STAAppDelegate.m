@@ -586,7 +586,10 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 - (void)cancelOperation:(id)sender
 {
-    [self toggleStashWindow:sender];
+    if ([[self preferencesController] appShouldHideWhenNotActive])
+    {
+        [self toggleStashWindow:sender];
+    }
 }
 
 - (void)windowDidResignKey:(NSNotification *)notification
