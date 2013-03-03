@@ -68,6 +68,8 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     _docsetArrayEditingQueue = dispatch_queue_create("org.beelsebob.Stash.docsetArrayEditing", DISPATCH_QUEUE_SERIAL);
+
+    [[self findBarHeightConstraint] setConstant:0.0f];
     
     [self setPreferencesController:[[STAPreferencesController alloc] initWithNibNamed:@"STAPreferencesController" bundle:nil]];
     [[self preferencesController] setDelegate:self];
@@ -84,6 +86,11 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     if (mode == STAIconShowingModeBoth || mode == STAIconShowingModeDock)
     {
         [[NSApplication sharedApplication] setActivationPolicy:NSApplicationActivationPolicyRegular];
+    }
+
+    if (![[self preferencesController] appShouldHideWhenNotActive])
+    {
+        [self toggleStashWindow:nil];
     }
     
     unichar c = [[self preferencesController] keyboardShortcutCharacter];
@@ -179,6 +186,16 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                    });
 }
 
+- (BOOL)applicationShouldHandleReopen:(NSApplication *)theApplication hasVisibleWindows:(BOOL)hasVisibleWindows
+{
+    if (!hasVisibleWindows)
+    {
+        [self toggleStashWindow:nil];
+    }
+
+    return YES;
+}
+
 - (void)dealloc
 {
     dispatch_release(_docsetArrayEditingQueue);
@@ -190,16 +207,12 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     if (![self isFindUIShowing])
     {
         [self setFindUIShowing:YES];
-        NSRect currentFrame = [[self resultWebView] frame];
-        currentFrame.size.height -= 25.0f;
         [NSAnimationContext runAnimationGroup:^ (NSAnimationContext *ctx)
          {
-             [[[self resultWebView] animator] setFrame:currentFrame];
+             [ctx setDuration:0.15];
+             [[[self findBarHeightConstraint] animator] setConstant:25.0f];
          }
-                            completionHandler:^()
-        {
-            [[self resultWebView] setFrame:currentFrame];
-        }];
+                            completionHandler:^(){}];
     }
 }
 
@@ -214,9 +227,8 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
         [self setFindUIShowing:NO];
         [NSAnimationContext runAnimationGroup:^ (NSAnimationContext *ctx)
          {
-             NSRect currentFrame = [[self resultWebView] frame];
-             currentFrame.size.height += 25.0f;
-             [[[self resultWebView] animator] setFrame:currentFrame];
+             [ctx setDuration:0.15];
+             [[[self findBarHeightConstraint] animator] setConstant:0.0f];
          }
                             completionHandler:^(){}];
     }
@@ -581,7 +593,10 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 - (void)cancelOperation:(id)sender
 {
-    [self toggleStashWindow:sender];
+    if ([[self preferencesController] appShouldHideWhenNotActive])
+    {
+        [self toggleStashWindow:sender];
+    }
 }
 
 - (void)windowDidResignKey:(NSNotification *)notification
