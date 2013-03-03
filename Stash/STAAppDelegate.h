@@ -27,6 +27,7 @@
 @property (weak) IBOutlet NSTableView *indexingDocsetsView;
 @property (weak) IBOutlet NSScrollView *indexingDocsetsContainer;
 @property (weak) IBOutlet NSView *docsetsNotFoundView;
+@property (weak) IBOutlet NSLayoutConstraint *findBarHeightConstraint;
 
 - (IBAction)toggleStashWindow:(id)sender;
 - (IBAction)search:(id)sender;
