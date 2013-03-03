@@ -170,6 +170,7 @@
 				1F09AFE815792B810081DC63 /* Products */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 		1F09AFE815792B810081DC63 /* Products */ = {
 			isa = PBXGroup;
