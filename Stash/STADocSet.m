@@ -200,7 +200,7 @@
 
 #ifdef DEBUG
     NSTimeInterval timeInterval = [start timeIntervalSinceNow];
-    DLog(@"Enumeration time (D:%@,Q:%@) %lf", self.name, searchString, timeInterval);
+    DLog(@"Enumeration time (D:%@,Q:%@) %lf", self.name, searchString, -timeInterval);
 #endif 
 }
 
