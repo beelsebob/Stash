@@ -85,6 +85,11 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     {
         [[NSApplication sharedApplication] setActivationPolicy:NSApplicationActivationPolicyRegular];
     }
+
+    if (![[self preferencesController] appShouldHideWhenNotActive])
+    {
+        [self toggleStashWindow:nil];
+    }
     
     unichar c = [[self preferencesController] keyboardShortcutCharacter];
     [[self openStashMenuItem] setKeyEquivalent:[NSString stringWithCharacters:&c length:1]];
@@ -177,6 +182,16 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                                            });
                         }];
                    });
+}
+
+- (BOOL)applicationShouldHandleReopen:(NSApplication *)theApplication hasVisibleWindows:(BOOL)hasVisibleWindows
+{
+    if (!hasVisibleWindows)
+    {
+        [self toggleStashWindow:nil];
+    }
+
+    return YES;
 }
 
 - (void)dealloc
@@ -581,7 +596,10 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 - (void)cancelOperation:(id)sender
 {
-    [self toggleStashWindow:sender];
+    if ([[self preferencesController] appShouldHideWhenNotActive])
+    {
+        [self toggleStashWindow:sender];
+    }
 }
 
 - (void)windowDidResignKey:(NSNotification *)notification
