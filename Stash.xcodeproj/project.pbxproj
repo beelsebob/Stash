@@ -51,12 +51,14 @@
 		1F747C1C1687D3B6006D2DFB /* Tick.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F747C1A1687D3B6006D2DFB /* Tick.png */; };
 		1F747C1D1687D3B6006D2DFB /* Tick@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F747C1B1687D3B6006D2DFB /* Tick@2x.png */; };
 		1F879AD71657AF2D004ABD2C /* HorizontalSeparator.png in Resources */ = {isa = PBXBuildFile; fileRef = 1F879AD61657AF2D004ABD2C /* HorizontalSeparator.png */; };
+		1F91C26716E3858C00AE40C5 /* STAMainWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F91C26616E3858C00AE40C5 /* STAMainWindowController.m */; };
 		1FBF3DE2157CAFD4007B8D97 /* STAPreferencesController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1FBF3DE1157CAFD4007B8D97 /* STAPreferencesController.xib */; };
 		1FBF3DE6157CAFEC007B8D97 /* STAPreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FBF3DE5157CAFEC007B8D97 /* STAPreferencesController.m */; };
 		1FBF3DED157E3F22007B8D97 /* iOS.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FBF3DE9157E3F22007B8D97 /* iOS.png */; };
 		1FBF3DEE157E3F22007B8D97 /* iOS@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FBF3DEA157E3F22007B8D97 /* iOS@2x.png */; };
 		1FBF3DEF157E3F22007B8D97 /* MacOS.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FBF3DEB157E3F22007B8D97 /* MacOS.png */; };
 		1FBF3DF0157E3F22007B8D97 /* MacOS@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1FBF3DEC157E3F22007B8D97 /* MacOS@2x.png */; };
+		1FE7C61516EE2E26008B7F86 /* STADocSetStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FE7C61416EE2E26008B7F86 /* STADocSetStore.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -129,6 +131,8 @@
 		1F747C1B1687D3B6006D2DFB /* Tick@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Tick@2x.png"; sourceTree = "<group>"; };
 		1F879AD61657AF2D004ABD2C /* HorizontalSeparator.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = HorizontalSeparator.png; sourceTree = "<group>"; };
 		1F879AD81658F3CC004ABD2C /* Stash.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Stash.entitlements; sourceTree = "<group>"; };
+		1F91C26516E3858C00AE40C5 /* STAMainWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STAMainWindowController.h; sourceTree = "<group>"; };
+		1F91C26616E3858C00AE40C5 /* STAMainWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STAMainWindowController.m; sourceTree = "<group>"; };
 		1FBF3DE1157CAFD4007B8D97 /* STAPreferencesController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = STAPreferencesController.xib; sourceTree = "<group>"; };
 		1FBF3DE4157CAFEC007B8D97 /* STAPreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STAPreferencesController.h; sourceTree = "<group>"; };
 		1FBF3DE5157CAFEC007B8D97 /* STAPreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STAPreferencesController.m; sourceTree = "<group>"; };
@@ -136,6 +140,8 @@
 		1FBF3DEA157E3F22007B8D97 /* iOS@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS@2x.png"; sourceTree = "<group>"; };
 		1FBF3DEB157E3F22007B8D97 /* MacOS.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MacOS.png; sourceTree = "<group>"; };
 		1FBF3DEC157E3F22007B8D97 /* MacOS@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "MacOS@2x.png"; sourceTree = "<group>"; };
+		1FE7C61316EE2E26008B7F86 /* STADocSetStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STADocSetStore.h; sourceTree = "<group>"; };
+		1FE7C61416EE2E26008B7F86 /* STADocSetStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STADocSetStore.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -208,11 +214,15 @@
 				1F879AD81658F3CC004ABD2C /* Stash.entitlements */,
 				1F09AFFD15792B810081DC63 /* STAAppDelegate.h */,
 				1F09AFFE15792B810081DC63 /* STAAppDelegate.m */,
+				1F91C26516E3858C00AE40C5 /* STAMainWindowController.h */,
+				1F91C26616E3858C00AE40C5 /* STAMainWindowController.m */,
 				1F09B00015792B810081DC63 /* MainMenu.xib */,
 				1F09B02115795C7F0081DC63 /* STADocSet.h */,
 				1F09B02215795C7F0081DC63 /* STADocSet.m */,
 				1F09B02F157A12E60081DC63 /* STASymbol.h */,
 				1F09B030157A12E70081DC63 /* STASymbol.m */,
+				1FE7C61316EE2E26008B7F86 /* STADocSetStore.h */,
+				1FE7C61416EE2E26008B7F86 /* STADocSetStore.m */,
 				1F50A3A4157BA41C00CF6068 /* STASymbolTableViewCell.h */,
 				1F50A3A5157BA41C00CF6068 /* STASymbolTableViewCell.m */,
 				1FBF3DE1157CAFD4007B8D97 /* STAPreferencesController.xib */,
@@ -454,6 +464,8 @@
 				1F09B031157A12E70081DC63 /* STASymbol.m in Sources */,
 				1F50A3A6157BA41C00CF6068 /* STASymbolTableViewCell.m in Sources */,
 				1FBF3DE6157CAFEC007B8D97 /* STAPreferencesController.m in Sources */,
+				1F91C26716E3858C00AE40C5 /* STAMainWindowController.m in Sources */,
+				1FE7C61516EE2E26008B7F86 /* STADocSetStore.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
