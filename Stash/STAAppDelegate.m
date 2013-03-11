@@ -29,6 +29,7 @@
     [self setPreferencesController:[[STAPreferencesController alloc] initWithNibNamed:@"STAPreferencesController" bundle:nil]];
     [[self preferencesController] setDelegate:self];
     [[self mainWindowController] setPreferencesController:[self preferencesController]];
+    [[self mainWindowController] windowDidLoad];
     
     STAIconShowingMode mode = [[self preferencesController] iconMode];
     
