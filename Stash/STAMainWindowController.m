@@ -34,7 +34,13 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 {
     [super windowDidLoad];
     
-    [[self findBarHeightConstraint] setConstant:0.0f];
+    NSRect findBarRect = [[self findBar] frame];
+    findBarRect.origin.y += findBarRect.size.height;
+    findBarRect.size.height = 0.0f;
+    [[self findBar] setFrame:findBarRect];
+    NSRect resultWebViewFrame = [[self resultWebView] frame];
+    resultWebViewFrame.size.height = findBarRect.origin.y - resultWebViewFrame.origin.y;
+    [[self resultWebView] setFrame:resultWebViewFrame];
     
     [[[self resultWebView] preferences] setJavaEnabled:NO];
     [[[self resultWebView] preferences] setJavaScriptEnabled:NO];
@@ -113,10 +119,16 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     if (![self isFindUIShowing])
     {
         [self setFindUIShowing:YES];
+        CGRect findBarFrame = [[self findBar] frame];
+        findBarFrame.origin.y -= 25.0f;
+        findBarFrame.size.height = 25.0f;
+        NSRect resultWebViewFrame = [[self resultWebView] frame];
+        resultWebViewFrame.size.height = findBarFrame.origin.y - resultWebViewFrame.origin.y;
         [NSAnimationContext runAnimationGroup:^ (NSAnimationContext *ctx)
          {
              [ctx setDuration:0.15];
-             [[[self findBarHeightConstraint] animator] setConstant:25.0f];
+             [[[self findBar] animator] setFrame:findBarFrame];
+             [[[self resultWebView] animator] setFrame:resultWebViewFrame];
          }
                             completionHandler:^(){}];
     }
@@ -131,10 +143,16 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
             [[self window] makeFirstResponder:[self searchField]];
         }
         [self setFindUIShowing:NO];
+        CGRect findBarFrame = [[self findBar] frame];
+        findBarFrame.origin.y += findBarFrame.size.height;
+        findBarFrame.size.height = 0.0f;
+        NSRect resultWebViewFrame = [[self resultWebView] frame];
+        resultWebViewFrame.size.height = findBarFrame.origin.y - resultWebViewFrame.origin.y;
         [NSAnimationContext runAnimationGroup:^ (NSAnimationContext *ctx)
          {
              [ctx setDuration:0.15];
-             [[[self findBarHeightConstraint] animator] setConstant:0.0f];
+             [[[self findBar] animator] setFrame:findBarFrame];
+             [[[self resultWebView] animator] setFrame:resultWebViewFrame];
          }
                             completionHandler:^(){}];
     }
@@ -308,6 +326,20 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
         [self setSelectedSearchField:(NSSearchField *)control];
     }
     return YES;
+}
+
+- (CGFloat)splitView:(NSSplitView *)splitView constrainMinCoordinate:(CGFloat)proposedMinimumPosition ofSubviewAt:(NSInteger)dividerIndex
+{
+    if (dividerIndex == 0)
+    {
+        return 229.0f;
+    }
+    return proposedMinimumPosition;
+}
+
+- (BOOL)splitView:(NSSplitView *)splitView shouldAdjustSizeOfSubview:(NSView *)view
+{
+    return view != [self searchColumn];
 }
 
 @end

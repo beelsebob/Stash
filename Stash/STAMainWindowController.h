@@ -13,7 +13,7 @@
 
 #import "STAPreferencesController.h"
 
-@interface STAMainWindowController : NSWindowController <NSWindowDelegate>
+@interface STAMainWindowController : NSWindowController <NSWindowDelegate, NSSplitViewDelegate>
 
 @property (strong, nonatomic) STADocSetStore *docsetStore;
 
@@ -22,11 +22,12 @@
 @property (strong) IBOutlet NSTextField *titleView;
 @property (strong) IBOutlet NSSearchField *searchField;
 @property (weak) IBOutlet NSMatrix *searchMethodSelector;
+@property (weak) IBOutlet NSView *findBar;
 @property (weak) IBOutlet NSSearchField *inPageSearchField;
 @property (weak) IBOutlet NSTableView *indexingDocsetsView;
 @property (weak) IBOutlet NSScrollView *indexingDocsetsContainer;
 @property (weak) IBOutlet NSView *docsetsNotFoundView;
-@property (weak) IBOutlet NSLayoutConstraint *findBarHeightConstraint;
+@property (weak) IBOutlet NSView *searchColumn;
 
 @property (strong) STAPreferencesController *preferencesController;
 
