@@ -186,36 +186,46 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^()
                        {
-                           @autoreleasepool
-                           {
-                               [docSet search:searchString
-                                       method:[[self searchMethodSelector] selectedRow] == 0 ? STASearchMethodPrefix : STASearchMethodContains
-                                     onResult:^(STASymbol *symbol)
-                                {
-                                    dispatch_sync(dispatch_get_main_queue(), ^()
-                                                  {
-                                                      if ([searchString isEqualToString:[self currentSearchString]])
-                                                      {
-                                                          [[self results] addObject:symbol];
-                                                          [[self sortedResults] insertObject:symbol
-                                                                                     atIndex:[[self sortedResults] indexOfObject:symbol
-                                                                                                                   inSortedRange:NSMakeRange(0, [[self sortedResults] count])
-                                                                                                                         options:NSBinarySearchingInsertionIndex
-                                                                                                                 usingComparator:^ NSComparisonResult (id a, id b)
-                                                                                              {
-                                                                                                  return [a compare:b];
-                                                                                              }]];
-                                                          [[self resultsTable] insertRowsAtIndexes:[NSIndexSet indexSetWithIndex:[[self sortedResults] indexOfObject:symbol]] withAnimation:0];
-                                                          if ([[self resultsTable] selectedRow] != 0)
-                                                          {
-                                                              [[self resultsTable] selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
-                                                          }
-                                                      }
-                                                  });
-                                }];
-                           }
+                           [self searchDocSet:docSet forString:searchString];
                        });
     }
+}
+
+- (void)searchDocSet:(STADocSet *)docSet forString:(NSString *)searchString
+{
+    @autoreleasepool
+    {
+        [docSet search:searchString
+                method:[[self searchMethodSelector] selectedRow] == 0 ? STASearchMethodPrefix : STASearchMethodContains
+              onResult:^(STASymbol *symbol)
+         {
+             [self setResultNeedsDisplay:symbol forSearchString:searchString];
+         }];
+    }
+}
+
+- (void)setResultNeedsDisplay:(STASymbol *)symbol forSearchString:(NSString *)searchString
+{
+    dispatch_sync(dispatch_get_main_queue(), ^()
+                  {
+                      if ([searchString isEqualToString:[self currentSearchString]])
+                      {
+                          [[self results] addObject:symbol];
+                          [[self sortedResults] insertObject:symbol
+                                                     atIndex:[[self sortedResults] indexOfObject:symbol
+                                                                                   inSortedRange:NSMakeRange(0, [[self sortedResults] count])
+                                                                                         options:NSBinarySearchingInsertionIndex
+                                                                                 usingComparator:^ NSComparisonResult (id a, id b)
+                                                              {
+                                                                  return [a compare:b];
+                                                              }]];
+                          [[self resultsTable] insertRowsAtIndexes:[NSIndexSet indexSetWithIndex:[[self sortedResults] indexOfObject:symbol]] withAnimation:0];
+                          if ([[self resultsTable] selectedRow] != 0)
+                          {
+                              [[self resultsTable] selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+                          }
+                      }
+                  });
 }
 
 - (IBAction)setSearchMethod:(id)sender
