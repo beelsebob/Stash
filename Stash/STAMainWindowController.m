@@ -211,15 +211,15 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                       if ([searchString isEqualToString:[self currentSearchString]])
                       {
                           [[self results] addObject:symbol];
-                          [[self sortedResults] insertObject:symbol
-                                                     atIndex:[[self sortedResults] indexOfObject:symbol
-                                                                                   inSortedRange:NSMakeRange(0, [[self sortedResults] count])
-                                                                                         options:NSBinarySearchingInsertionIndex
-                                                                                 usingComparator:^ NSComparisonResult (id a, id b)
-                                                              {
-                                                                  return [a compare:b];
-                                                              }]];
-                          [[self resultsTable] insertRowsAtIndexes:[NSIndexSet indexSetWithIndex:[[self sortedResults] indexOfObject:symbol]] withAnimation:0];
+                          NSUInteger insertionIndex = [[self sortedResults] indexOfObject:symbol
+                                                                            inSortedRange:NSMakeRange(0, [[self sortedResults] count])
+                                                                                  options:NSBinarySearchingInsertionIndex
+                                                                          usingComparator:^ NSComparisonResult (id a, id b)
+                                                       {
+                                                           return [a compare:b];
+                                                       }];
+                          [[self sortedResults] insertObject:symbol atIndex:insertionIndex];
+                          [[self resultsTable] insertRowsAtIndexes:[NSIndexSet indexSetWithIndex:insertionIndex] withAnimation:0];
                           if ([[self resultsTable] selectedRow] != 0)
                           {
                               [[self resultsTable] selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
