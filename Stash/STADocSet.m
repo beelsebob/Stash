@@ -91,10 +91,10 @@
     [aCoder encodeInt:[self platform] forKey:kDocSetPlatformKey];
 }
 
-- (void)processURL:(NSURL *)anUrl
+- (void)processURL:(NSURL *)aUrl
 {
     NSFileManager *fm = [NSFileManager defaultManager];
-    NSDirectoryEnumerator *enumerator = [fm enumeratorAtURL:anUrl
+    NSDirectoryEnumerator *enumerator = [fm enumeratorAtURL:aUrl
                                  includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLNameKey,
                                                                                       NSURLIsRegularFileKey,
                                                                                       NSURLIsDirectoryKey,
