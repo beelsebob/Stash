@@ -18,9 +18,9 @@
 #define kShowsIconWhereKey @"Shows Icon Where"
 #define kEnabledDocsetsKey @"Enabled Docsets"
 
-NSString *descriptingStringFromChar(unichar c);
+NSString *descriptionStringFromChar(unichar c);
 
-NSString *descriptingStringFromChar(unichar c)
+NSString *descriptionStringFromChar(unichar c)
 {
     switch (c)
     {
@@ -123,7 +123,7 @@ NSString *descriptingStringFromChar(unichar c)
     {
         [keyboardShortcutString appendString:[NSString stringWithCharacters:&command length:1]];
     }
-    [keyboardShortcutString appendString:descriptingStringFromChar([self keyboardShortcutCharacter])];
+    [keyboardShortcutString appendString:descriptionStringFromChar([self keyboardShortcutCharacter])];
     [[self shortcutText] setStringValue:keyboardShortcutString];
 }
 
