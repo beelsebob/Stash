@@ -264,8 +264,8 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
-    NSUInteger row = [[self resultsTable] selectedRow];
-    if (row < [[self sortedResults] count])
+    NSInteger row = [[self resultsTable] selectedRow];
+    if (row < [[self sortedResults] count] && row != -1)
     {
         STASymbol *symbol = [[self sortedResults] objectAtIndex:row];
         NSURLRequest *request = [NSURLRequest requestWithURL:[symbol url]];
