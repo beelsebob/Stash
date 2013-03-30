@@ -347,7 +347,7 @@
 
 - (NSString *)pathForArchive
 {
-    return [[NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDirectory, YES) objectAtIndex:0] stringByAppendingPathComponent:@"Stash"];
+    return [[NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"Stash"];
 }
 
 - (void)requestAccessToDirectory:(NSString *)directory continuation:(void(^)(NSURL *))cont
