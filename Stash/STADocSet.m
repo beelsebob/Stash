@@ -8,8 +8,6 @@
 
 #import "STADocSet.h"
 
-#import "STASymbol.h"
-
 #import "HTMLParser.h"
 
 @interface STADocSet ()
@@ -78,7 +76,7 @@
         [self setSymbols:[aDecoder decodeObjectForKey:kDocSetSymbolsKey]];
         [self setName:[aDecoder decodeObjectForKey:kDocSetNameKey]];
         [self setVersion:[aDecoder decodeObjectForKey:kDocSetVersionKey]];
-        [self setPlatform:[aDecoder decodeIntForKey:kDocSetPlatformKey]];
+        [self setPlatform:(STAPlatform) [aDecoder decodeIntForKey:kDocSetPlatformKey]];
         [self setLoaded:YES];
     }
     
@@ -93,15 +91,21 @@
     [aCoder encodeInt:[self platform] forKey:kDocSetPlatformKey];
 }
 
-- (void)processURL:(NSURL *)url
+- (void)processURL:(NSURL *)anUrl
 {
     NSFileManager *fm = [NSFileManager defaultManager];
-    NSDirectoryEnumerator *enumerator = [fm enumeratorAtURL:url includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLNameKey, NSURLIsRegularFileKey, NSURLIsDirectoryKey, nil] options:0 errorHandler:^ BOOL (NSURL *url, NSError *err)
-                                         {
-                                             return YES;
-                                         }];
+    NSDirectoryEnumerator *enumerator = [fm enumeratorAtURL:anUrl
+                                 includingPropertiesForKeys:[NSArray arrayWithObjects:NSURLNameKey,
+                                                                                      NSURLIsRegularFileKey,
+                                                                                      NSURLIsDirectoryKey,
+                                                                                      nil]
+                                                    options:0
+                                               errorHandler:^BOOL(NSURL *url, NSError *err)
+                                               {
+                                                   return YES;
+                                               }];
     NSURL *subUrl;
-    while (subUrl = [enumerator nextObject])
+    while ((subUrl = [enumerator nextObject]))
     {
         @autoreleasepool
         {

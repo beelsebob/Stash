@@ -8,11 +8,6 @@
 
 #import "STAAppDelegate.h"
 
-#import "STADocSet.h"
-#import "STADocSetStore.h"
-
-#import "STASymbolTableViewCell.h"
-
 @interface STAAppDelegate () <NSWindowDelegate>
 
 @property (strong, nonatomic) STADocSetStore *docsetStore;
@@ -378,8 +373,8 @@
                                             alternateButton:nil
                                                 otherButton:@"Quit"
                                   informativeTextWithFormat:@"Stash can not function without access to Xcode's documentation.  Please select the DocSets directory."];
-             NSInteger result = [alert runModal];
-             switch (result)
+             NSInteger alertResult = [alert runModal];
+             switch (alertResult)
              {
                  case NSAlertDefaultReturn:
                      [self requestAccessToDirectory:directory continuation:cont];
