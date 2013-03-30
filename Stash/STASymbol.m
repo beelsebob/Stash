@@ -47,8 +47,8 @@
     
     if (nil != self)
     {
-        [self setLanguage:[aDecoder decodeIntForKey:kSymbolLanguageKey]];
-        [self setSymbolType:[aDecoder decodeIntForKey:kSymbolSymbolTypeKey]];
+        [self setLanguage:(STALanguage) [aDecoder decodeIntForKey:kSymbolLanguageKey]];
+        [self setSymbolType:(STASymbolType) [aDecoder decodeIntForKey:kSymbolSymbolTypeKey]];
         [self setSymbolName:[aDecoder decodeObjectForKey:kSymbolSymbolNameKey]];
 //        [self setParentName:[aDecoder decodeObjectForKey:kSymbolParentNameKey]];
         [self setUrl:[aDecoder decodeObjectForKey:kSymbolURLKey]];
@@ -99,7 +99,6 @@
                 default:
                     return [NSString stringWithFormat:@"C: %d (%@)", _symbolType, _symbolName];
             }
-            break;
         }
         case STALanguageObjectiveC:
         {
@@ -141,6 +140,8 @@
         case STASearchMethodContains:
             return [[_symbolName lowercaseString] rangeOfString:searchString].location != NSNotFound;
     }
+
+    return NO;
 }
 
 - (NSComparisonResult)compare:(id)other
@@ -172,7 +173,7 @@ STALanguage STALanguageFromNSString(NSString *languageString)
     });
     
     NSNumber *language = languageStrings[languageString];
-    return language == nil ? STALanguageUnknown : [language intValue];
+    return (language == nil ? STALanguageUnknown :  (STALanguage)[language intValue]);
 }
 
 STASymbolType STASymbolTypeFromNSString(NSString *symbolTypeString)
@@ -203,5 +204,5 @@ STASymbolType STASymbolTypeFromNSString(NSString *symbolTypeString)
     });
     
     NSNumber *symbolType = symbolTypeStrings[symbolTypeString];
-    return symbolType == nil ? STASymbolTypeUnknown : [symbolType intValue];
+    return symbolType == nil ? STASymbolTypeUnknown : (STASymbolType)[symbolType intValue];
 }

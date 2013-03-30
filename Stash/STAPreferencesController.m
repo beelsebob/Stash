@@ -8,8 +8,6 @@
 
 #import "STAPreferencesController.h"
 
-#import "STASymbolTableViewCell.h"
-
 #import "STAAppDelegate.h"
 
 #define kModifierFlagsKey @"Modifier Flags"
@@ -258,7 +256,7 @@ NSString *descriptionStringFromChar(unichar c)
 
 - (unichar)keyboardShortcutCharacter
 {
-    return [[[NSUserDefaults standardUserDefaults] objectForKey:kKeyboardShortcutKey] intValue];
+    return (unichar) [[[NSUserDefaults standardUserDefaults] objectForKey:kKeyboardShortcutKey] intValue];
 }
 
 - (NSUInteger)keyboardShortcutModifierFlags
@@ -274,10 +272,16 @@ NSString *descriptionStringFromChar(unichar c)
 
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
+    if (row < 0)
+    {
+        return nil;
+    }
+
     STADocSet *docSet = [[[self registeredDocsets] sortedArrayUsingComparator:^ NSComparisonResult (STADocSet *ds1, STADocSet *ds2)
-                          {
-                              return [[ds1 name] compare:[ds2 name]];
-                          }] objectAtIndex:row];
+    {
+        return [[ds1 name] compare:[ds2 name]];
+    }] objectAtIndex:(NSUInteger) row];
+
     if ([[tableColumn identifier] isEqualToString:@"name"])
     {
         return [docSet name];
@@ -290,10 +294,16 @@ NSString *descriptionStringFromChar(unichar c)
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-    STADocSet *docSet = [[[self registeredDocsets] sortedArrayUsingComparator:^ NSComparisonResult (STADocSet *ds1, STADocSet *ds2)
-                          {
-                              return [[ds1 name] compare:[ds2 name]];
-                          }] objectAtIndex:row];
+    if (row < 0)
+    {
+        return;
+    }
+
+    STADocSet *docSet = [[[self registeredDocsets] sortedArrayUsingComparator:^NSComparisonResult(STADocSet *ds1, STADocSet *ds2)
+    {
+        return [[ds1 name] compare:[ds2 name]];
+    }] objectAtIndex:(NSUInteger) row];
+
     if (![[tableColumn identifier] isEqualToString:@"name"])
     {
         NSMutableArray *enabledDocsetNames = [[[NSUserDefaults standardUserDefaults] objectForKey:kEnabledDocsetsKey] mutableCopy];

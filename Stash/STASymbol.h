@@ -66,4 +66,5 @@ STASymbolType STASymbolTypeFromNSString(NSString *symbolTypeString);
 
 - (BOOL)matches:(NSString *)searchString method:(STASearchMethod)method;
 
+- (NSComparisonResult)compare:(id)other;
 @end

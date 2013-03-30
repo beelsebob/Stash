@@ -8,14 +8,12 @@
 
 #import "STAMainWindowController.h"
 
-#import "STADocSet.h"
-
 #import "STASymbolTableViewCell.h"
 
 NSImage *NSImageFromSTASymbolType(STASymbolType t);
 NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
-@interface STAMainWindowController ()
+@interface STAMainWindowController () <NSTableViewDelegate, NSTableViewDataSource>
 
 @property (copy) NSString *currentSearchString;
 @property (strong) NSMutableArray *results;
@@ -214,7 +212,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                           NSUInteger insertionIndex = [[self sortedResults] indexOfObject:symbol
                                                                             inSortedRange:NSMakeRange(0, [[self sortedResults] count])
                                                                                   options:NSBinarySearchingInsertionIndex
-                                                                          usingComparator:^ NSComparisonResult (id a, id b)
+                                                                          usingComparator:^ NSComparisonResult (STASymbol *a, STASymbol *b)
                                                        {
                                                            return [a compare:b];
                                                        }];
@@ -267,14 +265,19 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
     NSInteger row = [[self resultsTable] selectedRow];
     if (row < [[self sortedResults] count] && row != -1)
     {
-        STASymbol *symbol = [[self sortedResults] objectAtIndex:row];
+        STASymbol *symbol = [[self sortedResults] objectAtIndex:(NSUInteger) row];
         NSURLRequest *request = [NSURLRequest requestWithURL:[symbol url]];
         [[[self resultWebView] mainFrame] loadRequest:request];
     }
 }
 
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)aRow
 {
+    if (aRow < 0) {
+        return nil;
+    }
+    NSUInteger row = (NSUInteger) aRow;
+
     if (tableView == [self resultsTable])
     {
         STASymbolTableViewCell *view = [[STASymbolTableViewCell alloc] initWithFrame:NSZeroRect];
@@ -316,7 +319,6 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
             return tick;
         }
     }
-    return nil;
 }
 
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row
