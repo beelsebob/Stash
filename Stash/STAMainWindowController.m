@@ -17,7 +17,7 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
 
 @property (copy) NSString *currentSearchString;
 @property (strong) NSMutableArray *results;
-@property (strong) NSMutableArray *sortedResults;
+@property (strong) NSArray *sortedResults;
 @property (assign, getter=isFindUIShowing) BOOL findUIShowing;
 @property (weak) NSSearchField *selectedSearchField;
 
@@ -199,6 +199,11 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
          {
              [self setResultNeedsDisplay:symbol forSearchString:searchString];
          }];
+        dispatch_sync(dispatch_get_main_queue(), ^()
+                      {
+                          [self setSortedResults:[[self results] sortedArrayUsingSelector:@selector(compare:)]];
+                          [[self resultsTable] reloadData];
+                      });
     }
 }
 
@@ -209,19 +214,6 @@ NSImage *NSImageFromSTAPlatform(STAPlatform p);
                       if ([searchString isEqualToString:[self currentSearchString]])
                       {
                           [[self results] addObject:symbol];
-                          NSUInteger insertionIndex = [[self sortedResults] indexOfObject:symbol
-                                                                            inSortedRange:NSMakeRange(0, [[self sortedResults] count])
-                                                                                  options:NSBinarySearchingInsertionIndex
-                                                                          usingComparator:^ NSComparisonResult (STASymbol *a, STASymbol *b)
-                                                       {
-                                                           return [a compare:b];
-                                                       }];
-                          [[self sortedResults] insertObject:symbol atIndex:insertionIndex];
-                          [[self resultsTable] insertRowsAtIndexes:[NSIndexSet indexSetWithIndex:insertionIndex] withAnimation:0];
-                          if ([[self resultsTable] selectedRow] != 0)
-                          {
-                              [[self resultsTable] selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
-                          }
                       }
                   });
 }
