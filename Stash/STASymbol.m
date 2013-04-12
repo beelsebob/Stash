@@ -10,6 +10,8 @@
 
 #import "STADocSet.h"
 
+NSUInteger STASymbolTypeOrder(STASymbolType type);
+
 @implementation STASymbol
 
 - (id)initWithLanguageString:(NSString *)language symbolTypeString:(NSString *)symbolType symbolName:(NSString *)symbolName url:(NSURL *)url docSet:(STADocSet *)docSet
@@ -146,17 +148,49 @@
 
 - (NSComparisonResult)compare:(id)other
 {
-    NSComparisonResult r = [_symbolName compare:[other symbolName]];
-    if (r == NSOrderedSame)
+    NSUInteger o1 = STASymbolTypeOrder(_symbolType);
+    NSUInteger o2 = STASymbolTypeOrder([other symbolType]);
+    
+    if (o1 == o2)
     {
-        STAPlatform p1 = [_docSet platform];
-        STAPlatform p2 = [[other docSet] platform];
-        return p1 < p2 ? NSOrderedAscending : p1 > p2 ? NSOrderedDescending : NSOrderedSame;
+        NSComparisonResult r = [_symbolName compare:[other symbolName]];
+        if (r == NSOrderedSame)
+        {
+            STAPlatform p1 = [_docSet platform];
+            STAPlatform p2 = [[other docSet] platform];
+            return p1 < p2 ? NSOrderedAscending : p1 > p2 ? NSOrderedDescending : NSOrderedSame;
+        }
+        return r;
     }
-    return r;
+    return o1 < o2 ? NSOrderedAscending : NSOrderedDescending;
 }
 
 @end
+
+NSUInteger STASymbolTypeOrder(STASymbolType type)
+{
+    switch (type)
+    {
+        case STASymbolTypeClass:                return 0;
+        case STASymbolTypeInterface:            return 1;
+        case STASymbolTypeCategory:             return 2;
+        case STASymbolTypeInstanceProperty:     return 3;
+        case STASymbolTypeInterfaceProperty:    return 4;
+        case STASymbolTypeInstanceMethod:       return 5;
+        case STASymbolTypeInterfaceMethod:      return 6;
+        case STASymbolTypeClassMethod:          return 7;
+        case STASymbolTypeInterfaceClassMethod: return 8;
+        case STASymbolTypeClassConstant:        return 9;
+        case STASymbolTypeFunction:             return 10;
+        case STASymbolTypeTypeDefinition:       return 11;
+        case STASymbolTypeEnumerationConstant:  return 12;
+        case STASymbolTypeData:                 return 13;
+        case STASymbolTypeMacro:                return 14;
+        case STASymbolTypeTag:                  return 15;
+        case STASymbolTypeBinding:              return 16;
+        case STASymbolTypeUnknown:              return 17;
+    }
+}
 
 STALanguage STALanguageFromNSString(NSString *languageString)
 {
