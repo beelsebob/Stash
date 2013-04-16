@@ -19,8 +19,8 @@
 		1F09B01615792B810081DC63 /* StashTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F09B01515792B810081DC63 /* StashTests.m */; };
 		1F09B020157934F90081DC63 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F09B01F157934F90081DC63 /* WebKit.framework */; };
 		1F09B02315795C7F0081DC63 /* STADocSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F09B02215795C7F0081DC63 /* STADocSet.m */; };
-		1F09B02A157A06510081DC63 /* HTMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F09B026157A06510081DC63 /* HTMLNode.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		1F09B02B157A06510081DC63 /* HTMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F09B028157A06510081DC63 /* HTMLParser.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		1F09B02A157A06510081DC63 /* HTMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F09B026157A06510081DC63 /* HTMLNode.m */; };
+		1F09B02B157A06510081DC63 /* HTMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F09B028157A06510081DC63 /* HTMLParser.m */; };
 		1F09B02E157A067F0081DC63 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F09B02D157A067F0081DC63 /* libxml2.dylib */; };
 		1F09B031157A12E70081DC63 /* STASymbol.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F09B030157A12E70081DC63 /* STASymbol.m */; };
 		1F50A3A6157BA41C00CF6068 /* STASymbolTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F50A3A5157BA41C00CF6068 /* STASymbolTableViewCell.m */; };
